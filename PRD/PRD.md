@@ -96,7 +96,8 @@ Drop ×6, Air Squat ×8, Inch Worm ×5.
 
 ### 5.1a Warm-Up (per workout)
 - Each day carries its own warm-up drill list (from the PT program), rendered as a collapsible checklist above the main exercise list on the Active Workout Screen
-- Tap a row to check it off for the session — this is visual only and is **not** persisted to history in v1 (no weight/rep logging for warm-ups)
+- The header shows live round progress (e.g. "Round 1 of 2"), matching `warmup.rounds`. Tap a row to check it off; once every item in the list is checked, that round is complete and the checklist automatically resets to unchecked for the next round. Once the required number of rounds is done, the header shows "✓ All rounds complete" and the list locks (no more taps needed/possible) — it loops exactly `rounds` times, never stuck after one pass and never looping forever
+- This is visual only and is **not** persisted to history in v1 (no weight/rep logging for warm-ups); round progress resets on page navigation like the rest of in-session state
 - Each item shows its video thumbnail and rep scheme (including "each side" where relevant)
 
 ### 5.2 Active Workout Screen — Exercise List
@@ -293,6 +294,6 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 | 12 | Deploy to Netlify for a stable HTTPS URL + iOS "Add to Home Screen" | Complete — live at malestrom.netlify.app |
 | 13 | Exercise detail video `onerror` fallback — full-screen detail view wasn't wired to fall back to `demo.mp4` like the list thumbnails were, so it silently showed nothing for any exercise without a real filmed clip | Complete |
 | 14 | Gym-testing fixes: wider weight input, system light/dark theme via `prefers-color-scheme` | Complete |
-| 15 | Warm-up "dropdown"/cycling behaviour reported from gym testing — description doesn't match the current checklist implementation (no dropdown/cycling exists in the code); clarifying with user before building | Blocked — pending clarification |
+| 15 | Warm-up round tracking — checking off every item now completes a round and loops the checklist back to unchecked for the next round (per `warmup.rounds`), instead of each item only ever being checkable once | Complete |
 
 **Note:** Phase 7 will use [Chart.js](https://www.chartjs.org/) (CDN) for graph rendering — no install required.

@@ -504,9 +504,18 @@ function initWorkoutScreen() {
     });
 }
 
+// In-session warm-up progress: which round we're on and which items are
+// checked off within the CURRENT round. Reset naturally on every full page
+// navigation (new workout), same as sessionData. Not persisted to history.
+let warmupRound = 1;
+let warmupCheckedIndices = new Set();
+
 /**
- * Warm-up is a non-logging checklist: tap a row to check it off for this
- * session. Nothing here is persisted to history.
+ * Warm-up is a non-logging checklist, but the program specifies a number of
+ * rounds (e.g. 2) through the same drill list. Checking off every item
+ * completes a round and loops the checklist back to unchecked for the next
+ * round, until all required rounds are done — it doesn't get stuck after
+ * one pass, and doesn't keep looping once the required rounds are met.
  */
 function renderWarmup(warmup) {
     const container = document.getElementById('warmup-container');
@@ -517,17 +526,25 @@ function renderWarmup(warmup) {
         return;
     }
 
-    const roundsLabel = [warmup.cardio, warmup.rounds ? `${warmup.rounds} rounds` : null]
-        .filter(Boolean).join(' · ');
+    // Capture expand/collapse state from the DOM about to be replaced, so a
+    // re-render triggered by checking off an item doesn't collapse the panel.
+    const wasExpanded = document.getElementById('warmup-list')?.classList.contains('expanded') ?? false;
+
+    const totalRounds = warmup.rounds || 1;
+    const allRoundsDone = warmupRound > totalRounds;
+    const roundLabel = allRoundsDone ? '✓ All rounds complete' : `Round ${warmupRound} of ${totalRounds}`;
+    const headerLabel = [warmup.cardio, roundLabel].filter(Boolean).join(' · ');
 
     container.innerHTML = `
         <button type="button" class="warmup-toggle" id="warmup-toggle">
-            <span>🔥 Warm-up${roundsLabel ? ` — ${roundsLabel}` : ''}</span>
+            <span>🔥 Warm-up${headerLabel ? ` — ${headerLabel}` : ''}</span>
             <span class="warmup-toggle-icon">▾</span>
         </button>
         <div class="warmup-list" id="warmup-list">
-            ${warmup.items.map((item, idx) => `
-                <div class="warmup-item" data-warmup-idx="${idx}">
+            ${warmup.items.map((item, idx) => {
+                const done = allRoundsDone || warmupCheckedIndices.has(idx);
+                return `
+                <div class="warmup-item${done ? ' done' : ''}" data-warmup-idx="${idx}">
                     <div class="warmup-item-thumb">
                         <video src="${item.video}" onerror="onVideoError(this)"
                                autoplay loop muted playsinline></video>
@@ -536,22 +553,42 @@ function renderWarmup(warmup) {
                         <div class="warmup-item-name">${item.name}</div>
                         <div class="warmup-item-reps">${item.reps}x${item.perSide ? ' each side' : ''}${item.note ? ` — ${item.note}` : ''}</div>
                     </div>
-                    <span class="warmup-item-check">○</span>
+                    <span class="warmup-item-check">${done ? '✓' : '○'}</span>
                 </div>
-            `).join('')}
+            `;
+            }).join('')}
         </div>
     `;
+
+    if (wasExpanded) {
+        document.getElementById('warmup-list')?.classList.add('expanded');
+        document.getElementById('warmup-toggle')?.classList.add('expanded');
+    }
 
     document.getElementById('warmup-toggle')?.addEventListener('click', () => {
         document.getElementById('warmup-list')?.classList.toggle('expanded');
         document.getElementById('warmup-toggle')?.classList.toggle('expanded');
     });
 
+    if (allRoundsDone) return;
+
     container.querySelectorAll('.warmup-item').forEach(row => {
         row.addEventListener('click', () => {
-            row.classList.toggle('done');
-            const check = row.querySelector('.warmup-item-check');
-            if (check) check.textContent = row.classList.contains('done') ? '✓' : '○';
+            const idx = parseInt(row.dataset.warmupIdx);
+            if (warmupCheckedIndices.has(idx)) {
+                warmupCheckedIndices.delete(idx);
+            } else {
+                warmupCheckedIndices.add(idx);
+            }
+
+            // Round complete once every item is checked — loop back to the
+            // start for the next round (or finish if that was the last one).
+            if (warmupCheckedIndices.size === warmup.items.length) {
+                warmupCheckedIndices.clear();
+                warmupRound += 1;
+            }
+
+            renderWarmup(warmup);
         });
     });
 }
