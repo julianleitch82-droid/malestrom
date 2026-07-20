@@ -87,7 +87,7 @@ Drop ×6, Air Squat ×8, Inch Worm ×5.
 
 ---
 
-## 5. Features — Version 1.0
+## 5. Features
 
 ### 5.1 Home Screen
 - Display the current program's workout days as cards, rendered from `PROGRAM.days` (currently Day A - Chest/Shoulders/Triceps, Day B - Back/Biceps, Day C - Legs/Abs)
@@ -95,8 +95,8 @@ Drop ×6, Air Squat ×8, Inch Worm ×5.
 - Tap a day to begin that workout
 
 ### 5.1a Warm-Up (per workout)
-- Each day carries its own warm-up drill list (from the PT program), rendered as a collapsible checklist above the main exercise list on the Active Workout Screen
-- The header shows live round progress (e.g. "Round 1 of 2"), matching `warmup.rounds`. Tap a row to check it off; once every item in the list is checked, that round is complete and the checklist automatically resets to unchecked for the next round. Once the required number of rounds is done, the header shows "✓ All rounds complete" and the list locks (no more taps needed/possible) — it loops exactly `rounds` times, never stuck after one pass and never looping forever
+- Each day carries its own warm-up drill list (from the PT program), rendered as a collapsible checklist above the main exercise list on the Active Workout Screen. If the day has a cardio line (e.g. "2-3 min cardio"), it's shown as the first checklist row rather than folded into the header text
+- The header shows live round progress (e.g. "Round 1 of 2"), matching `warmup.rounds`. Tap a row to check it off; once every item in the list is checked, the whole card pulses (a 3x opacity blink, ~350ms per cycle) as confirmation, taps are locked out for that moment, and only then does the checklist reset to unchecked for the next round. Once the required number of rounds is done, that same blink plays once more and the header locks into "✓ All rounds complete" (no more taps possible) — it loops exactly `rounds` times, never stuck after one pass and never looping forever
 - This is visual only and is **not** persisted to history in v1 (no weight/rep logging for warm-ups); round progress resets on page navigation like the rest of in-session state
 - Each item shows its video thumbnail and rep scheme (including "each side" where relevant)
 
@@ -139,8 +139,8 @@ A persistent bar docked to the bottom of the Exercise Detail View — it never s
 
 - Starts automatically after the user taps "Complete Set", provided there are more sets remaining
 - Default rest period: 90 seconds (adjustable in settings: 30s / 60s / 90s / 120s / 180s)
-- Shows a large countdown and a depleting blue fill behind it
-- Turns green and pulses (with haptic vibration on supported devices) when time is up
+- Shows a large countdown and a depleting pink fill behind it (matches `--accent-primary`, updated from the original blue when the app was re-themed)
+- Turns green and pulses (with haptic vibration on supported devices — vibration is a no-op on iOS Safari, which has never implemented the Vibration API; the chime still sounds) when time is up
 - "Skip" button dismisses the timer early
 - Timer stops when the user taps "← Back" to return to the exercise list
 
@@ -157,6 +157,10 @@ A persistent bar docked to the bottom of the Exercise Detail View — it never s
 - Manifest file so the app can be installed from Safari
 - App icon placeholder
 - Works offline after first load
+
+### 5.6 Info Screen
+- Static "Diplomat Health Type" nutrition and training-timing guidance from the PT program (not gamified/logged)
+- **Force Refresh App button**: unregisters the service worker and clears Cache Storage directly via the Service Worker API, then navigates to a freshly-fetched home screen. Deliberately leaves `localStorage` untouched so logged workout history survives. Exists because iOS Safari's per-site "clear website data" has proven unreliable in practice (deleted entries can silently repopulate from a backgrounded app instance), whose only reliable fallback is wiping *all* Safari site data — this button avoids needing that
 
 ---
 
@@ -187,7 +191,10 @@ an app rewrite. An in-app UI for switching between multiple *saved* programs is 
   values under a `@media (prefers-color-scheme: light)` block. The pink brand accent stays
   constant across both themes; only backgrounds/text/border shades change.
 - **Large tap targets:** buttons and inputs sized for sweaty fingers, weight input sized wider
-  than reps (`flex: 1.5` vs `1`) for comfortable typing of decimal values like "22.5"
+  than reps (`flex: 1.5` vs `1`, and `flex: 2` on the sibling Reps L/R container in the per-side
+  layout so the ratio holds there too) for comfortable typing of decimal values like "22.5" or
+  "100.5". Every number input also carries a `min-width: 5ch` floor as a defensive backstop
+  against any future layout squeeze clipping the display value
 - **Minimal navigation:** get in, log the workout, get out
 - **Colours:** simple, clean — no unnecessary decoration
 
@@ -261,7 +268,7 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
   manifest.json       ← PWA manifest
   service-worker.js   ← Offline caching
   /PRD
-    PRD.md            ← This document
+    PRD.md             ← This document
     Notes.md           ← Local-network phone testing instructions
   /icons
     icon-192.png
