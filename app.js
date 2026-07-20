@@ -661,6 +661,7 @@ function openExerciseDetail(exerciseIndex) {
     // Restart video from beginning (user gesture context — required for iOS autoplay)
     const video = document.getElementById('detail-video');
     if (video) {
+        video.onerror = () => onVideoError(video);
         video.src = exercise.video;
         video.currentTime = 0;
         video.play().catch(() => {});
