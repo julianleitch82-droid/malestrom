@@ -530,28 +530,35 @@ function renderWarmup(warmup) {
     // re-render triggered by checking off an item doesn't collapse the panel.
     const wasExpanded = document.getElementById('warmup-list')?.classList.contains('expanded') ?? false;
 
+    // The cardio line (e.g. "2-3 min cardio") is the first thing to do in the
+    // warm-up, so it's shown as the first checklist row rather than buried in
+    // the header — same round-tracking as every other item.
+    const displayItems = warmup.cardio
+        ? [{ name: warmup.cardio, isCardio: true }, ...warmup.items]
+        : warmup.items;
+
     const totalRounds = warmup.rounds || 1;
     const allRoundsDone = warmupRound > totalRounds;
     const roundLabel = allRoundsDone ? '✓ All rounds complete' : `Round ${warmupRound} of ${totalRounds}`;
-    const headerLabel = [warmup.cardio, roundLabel].filter(Boolean).join(' · ');
 
     container.innerHTML = `
         <button type="button" class="warmup-toggle" id="warmup-toggle">
-            <span>🔥 Warm-up${headerLabel ? ` — ${headerLabel}` : ''}</span>
+            <span>🔥 Warm-up — ${roundLabel}</span>
             <span class="warmup-toggle-icon">▾</span>
         </button>
         <div class="warmup-list" id="warmup-list">
-            ${warmup.items.map((item, idx) => {
+            ${displayItems.map((item, idx) => {
                 const done = allRoundsDone || warmupCheckedIndices.has(idx);
                 return `
                 <div class="warmup-item${done ? ' done' : ''}" data-warmup-idx="${idx}">
                     <div class="warmup-item-thumb">
-                        <video src="${item.video}" onerror="onVideoError(this)"
-                               autoplay loop muted playsinline></video>
+                        ${item.isCardio
+                            ? '<span class="warmup-item-thumb-icon">🏃</span>'
+                            : `<video src="${item.video}" onerror="onVideoError(this)" autoplay loop muted playsinline></video>`}
                     </div>
                     <div class="warmup-item-info">
                         <div class="warmup-item-name">${item.name}</div>
-                        <div class="warmup-item-reps">${item.reps}x${item.perSide ? ' each side' : ''}${item.note ? ` — ${item.note}` : ''}</div>
+                        ${item.isCardio ? '' : `<div class="warmup-item-reps">${item.reps}x${item.perSide ? ' each side' : ''}${item.note ? ` — ${item.note}` : ''}</div>`}
                     </div>
                     <span class="warmup-item-check">${done ? '✓' : '○'}</span>
                 </div>
@@ -583,7 +590,7 @@ function renderWarmup(warmup) {
 
             // Round complete once every item is checked — loop back to the
             // start for the next round (or finish if that was the last one).
-            if (warmupCheckedIndices.size === warmup.items.length) {
+            if (warmupCheckedIndices.size === displayItems.length) {
                 warmupCheckedIndices.clear();
                 warmupRound += 1;
             }
