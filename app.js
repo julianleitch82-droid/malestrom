@@ -1171,7 +1171,41 @@ function formatHistorySetLine(exercise, set) {
 }
 
 /* ===================================================================
-   7. INITIALIZATION ON PAGE LOAD
+   7. INFO SCREEN LOGIC
+   =================================================================== */
+
+/**
+ * "Force Refresh" button: unregisters the service worker and clears its
+ * Cache Storage entries (stale app.js/style.css/HTML), then navigates to
+ * a freshly-fetched home screen. Deliberately does NOT touch localStorage,
+ * so logged workout history survives — unlike clearing site data in the
+ * phone's browser settings, which wipes everything for the site.
+ */
+function initInfoScreen() {
+    document.getElementById('force-refresh-btn')?.addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true;
+        btn.textContent = 'Refreshing…';
+
+        try {
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(registrations.map(r => r.unregister()));
+            }
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+            }
+        } catch (err) {
+            console.error('Force refresh failed:', err);
+        }
+
+        window.location.href = 'index.html';
+    });
+}
+
+/* ===================================================================
+   8. INITIALIZATION ON PAGE LOAD
    =================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1189,6 +1223,8 @@ document.addEventListener('DOMContentLoaded', () => {
         initWorkoutScreen();
     } else if (document.getElementById('history-screen')) {
         initHistoryScreen();
+    } else if (document.getElementById('info-screen')) {
+        initInfoScreen();
     }
 
     console.log('✓ Application ready');

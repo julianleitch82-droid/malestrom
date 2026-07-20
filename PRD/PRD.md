@@ -295,5 +295,8 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 | 13 | Exercise detail video `onerror` fallback — full-screen detail view wasn't wired to fall back to `demo.mp4` like the list thumbnails were, so it silently showed nothing for any exercise without a real filmed clip | Complete |
 | 14 | Gym-testing fixes: wider weight input, system light/dark theme via `prefers-color-scheme` | Complete |
 | 15 | Warm-up round tracking — checking off every item now completes a round and loops the checklist back to unchecked for the next round (per `warmup.rounds`), instead of each item only ever being checkable once | Complete |
+| 16 | Weight input clipping fix in the per-side (L/R) set layout — flex-basis mismatch between the weight field and the Reps Left/Right container squeezed weight down to ~1 character wide; state was never actually truncated, purely a CSS bug | Complete |
+| 17 | Warm-up cardio line moved from the header into the checklist as the first item (was previously baked into the collapsible header text) | Complete |
+| 18 | "Force Refresh App" button on the Info screen — unregisters the service worker and clears Cache Storage (keeps `localStorage`/workout history intact) then reloads, so a stuck iOS service worker doesn't require digging through phone Settings → Website Data | Complete |
 
 **Note:** Phase 7 will use [Chart.js](https://www.chartjs.org/) (CDN) for graph rendering — no install required.
