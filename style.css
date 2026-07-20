@@ -480,6 +480,8 @@ body,
 
 .input-group input {
     width: 100%;
+    min-width: 5ch; /* floor so weights like "100.5" never clip regardless of flex distribution */
+    box-sizing: border-box;
     padding: var(--spacing-md);
     min-height: var(--touch-target-height);
     background-color: var(--bg-card);
@@ -1200,6 +1202,12 @@ input:focus-visible {
 .side-inputs {
     display: flex;
     gap: var(--spacing-md);
+    /* Sibling to .input-group-weight (flex: 1.5) inside .active-set-inputs.
+       Without an explicit flex-basis here, this container's auto/content
+       basis dominates the flex-basis:0% weight field during shrink and
+       squeezes it down to a sliver — flex: 2 keeps the ~1.5 : 1 : 1
+       (weight : reps-left : reps-right) ratio consistent under pressure. */
+    flex: 2;
 }
 
 /* ===================================================================
