@@ -1218,6 +1218,18 @@ input:focus-visible {
     margin-bottom: var(--spacing-lg);
 }
 
+/* Soft blink confirmation on round completion, before the checklist resets
+   for the next round (or locks as complete on the final one). Respects
+   prefers-reduced-motion via the global override in section 12. */
+@keyframes warmup-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
+.warmup-container.warmup-blinking {
+    animation: warmup-blink 350ms ease-in-out 3;
+}
+
 .warmup-toggle {
     width: 100%;
     display: flex;

@@ -298,5 +298,6 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 | 16 | Weight input clipping fix in the per-side (L/R) set layout — flex-basis mismatch between the weight field and the Reps Left/Right container squeezed weight down to ~1 character wide; state was never actually truncated, purely a CSS bug | Complete |
 | 17 | Warm-up cardio line moved from the header into the checklist as the first item (was previously baked into the collapsible header text) | Complete |
 | 18 | "Force Refresh App" button on the Info screen — unregisters the service worker and clears Cache Storage (keeps `localStorage`/workout history intact) then reloads, so a stuck iOS service worker doesn't require digging through phone Settings → Website Data | Complete |
+| 19 | Warm-up round-completion "blink" — the whole warm-up card pulses opacity 3x as confirmation before the checklist resets/advances, instead of resetting instantly; locked against taps during the animation; applies identically to every round including the final one | Complete |
 
 **Note:** Phase 7 will use [Chart.js](https://www.chartjs.org/) (CDN) for graph rendering — no install required.

@@ -509,6 +509,9 @@ function initWorkoutScreen() {
 // navigation (new workout), same as sessionData. Not persisted to history.
 let warmupRound = 1;
 let warmupCheckedIndices = new Set();
+// True for the brief window between "round just got fully checked" and the
+// blink animation finishing — checklist is locked (no listeners) during it.
+let warmupTransitioning = false;
 
 /**
  * Warm-up is a non-logging checklist, but the program specifies a number of
@@ -577,7 +580,7 @@ function renderWarmup(warmup) {
         document.getElementById('warmup-toggle')?.classList.toggle('expanded');
     });
 
-    if (allRoundsDone) return;
+    if (allRoundsDone || warmupTransitioning) return;
 
     container.querySelectorAll('.warmup-item').forEach(row => {
         row.addEventListener('click', () => {
@@ -588,11 +591,24 @@ function renderWarmup(warmup) {
                 warmupCheckedIndices.add(idx);
             }
 
-            // Round complete once every item is checked — loop back to the
-            // start for the next round (or finish if that was the last one).
+            // Round complete once every item is checked. Show the fully-
+            // checked state, blink the whole card as confirmation, and only
+            // then reset/advance — applies the same way to every round,
+            // including the final one (which locks into "all complete").
             if (warmupCheckedIndices.size === displayItems.length) {
-                warmupCheckedIndices.clear();
-                warmupRound += 1;
+                warmupTransitioning = true;
+                renderWarmup(warmup);
+
+                const card = document.getElementById('warmup-container');
+                card.classList.add('warmup-blinking');
+                card.addEventListener('animationend', () => {
+                    card.classList.remove('warmup-blinking');
+                    warmupTransitioning = false;
+                    warmupCheckedIndices.clear();
+                    warmupRound += 1;
+                    renderWarmup(warmup);
+                }, { once: true });
+                return;
             }
 
             renderWarmup(warmup);
