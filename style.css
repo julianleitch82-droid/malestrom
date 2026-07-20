@@ -1,0 +1,1320 @@
+/* 
+ * ===================================================================
+ * WORKOUT TRACKER - GLOBAL STYLES
+ * ===================================================================
+ * 
+ * Mobile-first, dark mode styling optimized for iPhone Safari.
+ * Minimum tap targets: 48px height for buttons and inputs.
+ * High contrast light text on dark background for gym readability.
+ * 
+ */
+
+/* ===================================================================
+   1. ROOT & CSS VARIABLES
+   =================================================================== */
+
+:root {
+    /* Color Palette - Dark Mode
+       Pulled from Jess Males Coaching & Fitness's Facebook branding
+       (near-black background, hot pink/magenta accent). Tune the exact
+       hex values here by eye against her page if they need adjusting. */
+    --bg-dark: #0d0d0d;           /* Main background */
+    --bg-darker: #000000;         /* Darker sections */
+    --bg-card: #1c1c1c;           /* Card backgrounds */
+    --text-light: #f5f5f5;        /* Primary text */
+    --text-muted: #a8a8a8;        /* Secondary text */
+    --accent-primary: #ff2d78;    /* Primary accent (hot pink/magenta) */
+    --accent-primary-rgb: 255, 45, 120;
+    --accent-primary-active: #d81f61; /* darker pink for :active states */
+    --accent-info: #4a9eff;       /* Tempo/eccentric coaching notes */
+    --accent-success: #4caf50;    /* Success state (green) */
+    --accent-warning: #ff9800;    /* Warning/attention (orange) */
+    --accent-danger: #f44336;     /* Danger/error (red) */
+    --border-color: #333333;      /* Subtle borders */
+    
+    /* Typography */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+    --font-size-base: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --font-size-sm: 14px;
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Borders and Shadows */
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+    
+    /* Touch targets (minimum 48px height/width) */
+    --touch-target-height: 48px;
+    --touch-target-padding: 12px 16px;
+}
+
+/* ===================================================================
+   2. RESET & BASE STYLES
+   =================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    color: var(--text-light);
+    background-color: var(--bg-dark);
+    line-height: 1.6;
+    
+    /* Prevent viewport zoom on input focus in Safari */
+    font-size: 16px;
+}
+
+/* Ensure full height layout for PWA */
+html,
+body,
+#app-container {
+    height: 100%;
+}
+
+/* ===================================================================
+   3. HEADER & NAVIGATION
+   =================================================================== */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-darker);
+    padding: var(--spacing-md) var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    
+    /* Safe area for notch/home indicator on iOS */
+    padding-top: max(var(--spacing-md), env(safe-area-inset-top));
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+}
+
+.app-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    white-space: nowrap;
+    flex: 1;
+}
+
+/* Header navigation */
+.header-nav {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.nav-link {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--accent-primary);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease;
+    min-height: var(--touch-target-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-link:active {
+    background-color: rgba(var(--accent-primary-rgb), 0.1);
+}
+
+.nav-link.active {
+    font-weight: 600;
+    color: var(--accent-primary);
+}
+
+/* ===================================================================
+   4. MAIN LAYOUT
+   =================================================================== */
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;  /* Smooth scrolling on iOS */
+    padding: var(--spacing-md);
+    padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
+    
+    /* Allow keyboard to push content up on mobile */
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+}
+
+/* Screen sections (hidden by default, shown via .active class) */
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* ===================================================================
+   5. HOME SCREEN - WORKOUT DAYS
+   =================================================================== */
+
+.section-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-light);
+}
+
+.intro-text {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.5;
+}
+
+/* Container for day cards */
+.days-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Individual day card */
+.day-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-md);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.day-card:active {
+    background-color: rgba(var(--accent-primary-rgb), 0.05);
+    border-color: var(--accent-primary);
+}
+
+.day-header {
+    margin-bottom: var(--spacing-md);
+}
+
+.day-letter {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    color: var(--accent-primary);
+}
+
+.day-focus {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.day-info {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.last-completed,
+.exercise-count {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin: var(--spacing-xs) 0;
+}
+
+/* Button inside day card */
+.start-workout-btn {
+    width: 100%;
+    padding: var(--spacing-md);
+    min-height: var(--touch-target-height);
+    background-color: var(--accent-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.start-workout-btn:active {
+    background-color: var(--accent-primary-active);
+}
+
+/* ===================================================================
+   6. BUTTONS & TOUCH TARGETS
+   =================================================================== */
+
+.btn {
+    min-height: var(--touch-target-height);
+    padding: var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.btn-primary {
+    background-color: var(--accent-primary);
+    color: #fff;
+}
+
+.btn-primary:active {
+    background-color: var(--accent-primary-active);
+}
+
+.btn-secondary {
+    background-color: var(--bg-card);
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:active {
+    background-color: #3a3a3a;
+}
+
+.btn-large {
+    width: 100%;
+    font-size: var(--font-size-lg);
+}
+
+.action-btn {
+    display: block;
+    width: 100%;
+    min-height: var(--touch-target-height);
+    padding: var(--spacing-md);
+    background-color: var(--bg-card);
+    color: var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: var(--spacing-md);
+}
+
+.action-btn:active {
+    background-color: rgba(var(--accent-primary-rgb), 0.1);
+}
+
+/* Actions section on home screen */
+.actions-section {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
+
+/* ===================================================================
+   7. WORKOUT SCREEN
+   =================================================================== */
+
+.workout-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+#workout-day-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-light);
+}
+
+.workout-date {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* Progress bar */
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background-color: var(--bg-card);
+    border-radius: 2px;
+    margin-bottom: var(--spacing-sm);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--accent-success);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Exercises container */
+.exercises-container {
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Exercise card */
+.exercise-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.exercise-name {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: var(--spacing-sm);
+}
+
+.exercise-target {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+.exercise-warning {
+    background-color: rgba(255, 152, 0, 0.1);
+    border-left: 3px solid var(--accent-warning);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    color: var(--accent-warning);
+}
+
+/* Sets logging section */
+.sets-section {
+    margin-bottom: var(--spacing-md);
+}
+
+.set-log {
+    background-color: var(--bg-darker);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-sm);
+}
+
+.set-number {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+.set-inputs {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.input-group {
+    flex: 1;
+}
+
+.input-group label {
+    display: block;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-xs);
+}
+
+.input-group input {
+    width: 100%;
+    padding: var(--spacing-md);
+    min-height: var(--touch-target-height);
+    background-color: var(--bg-card);
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-lg);
+    text-align: center;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background-color: rgba(var(--accent-primary-rgb), 0.05);
+}
+
+/* Workout actions buttons */
+.workout-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+/* ===================================================================
+   8. HISTORY SCREEN
+   =================================================================== */
+
+.filter-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.filter-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-height: var(--touch-target-height);
+    background-color: var(--bg-card);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn.active {
+    background-color: var(--accent-primary);
+    color: #fff;
+    border-color: var(--accent-primary);
+}
+
+.filter-btn:active {
+    opacity: 0.8;
+}
+
+.history-container {
+    margin-bottom: var(--spacing-lg);
+}
+
+.session-item {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    min-height: var(--touch-target-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.session-item:active {
+    background-color: rgba(var(--accent-primary-rgb), 0.05);
+    border-color: var(--accent-primary);
+}
+
+.session-info {
+    flex: 1;
+}
+
+.session-day {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.session-date {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.session-arrow {
+    font-size: var(--font-size-lg);
+    color: var(--text-muted);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-muted);
+}
+
+.empty-state p {
+    margin-bottom: var(--spacing-md);
+}
+
+.empty-state-hint {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* ===================================================================
+   9. MODAL STYLES
+   =================================================================== */
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    z-index: 200;
+    max-width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-light);
+}
+
+.modal-close {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: var(--font-size-2xl);
+    cursor: pointer;
+    min-width: var(--touch-target-height);
+    min-height: var(--touch-target-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 199;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-exercises {
+    margin: var(--spacing-lg) 0;
+}
+
+.modal-exercise-item {
+    background-color: var(--bg-darker);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border-radius: var(--border-radius);
+}
+
+.modal-exercise-name {
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: var(--spacing-sm);
+}
+
+.modal-set {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    padding: var(--spacing-sm) 0;
+}
+
+/* ===================================================================
+   10. RESPONSIVE DESIGN
+   =================================================================== */
+
+/* Tablet and larger screens */
+@media (min-width: 768px) {
+    .days-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .main-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        width: 100%;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1024px) {
+    .days-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ===================================================================
+   11. PRINT STYLES (for reference, unlikely needed in PWA)
+   =================================================================== */
+
+@media print {
+    body {
+        background-color: white;
+        color: black;
+    }
+}
+
+/* ===================================================================
+   12. ACCESSIBILITY
+   =================================================================== */
+
+/* Focus visible for keyboard navigation */
+.btn:focus-visible,
+.nav-link:focus-visible,
+.filter-btn:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===================================================================
+   13. EXERCISE LIST ROWS
+   =================================================================== */
+
+.exercise-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    min-height: 72px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.exercise-row:active {
+    border-color: var(--accent-primary);
+    background-color: rgba(var(--accent-primary-rgb), 0.05);
+}
+
+.exercise-row.all-done {
+    border-color: var(--accent-success);
+}
+
+.exercise-row-thumb {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e2d3a, #2d3d4d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.exercise-thumb-gif {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.exercise-row-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.exercise-row-name {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: var(--spacing-xs);
+}
+
+.exercise-row-target {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.exercise-row-warn {
+    font-size: var(--font-size-sm);
+    color: var(--accent-warning);
+    margin-top: var(--spacing-xs);
+}
+
+.exercise-row-status {
+    flex-shrink: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    font-weight: 600;
+    min-width: 36px;
+    text-align: right;
+}
+
+.exercise-row-status.done {
+    color: var(--accent-success);
+    font-size: var(--font-size-xl);
+}
+
+/* ===================================================================
+   14. EXERCISE DETAIL OVERLAY
+   =================================================================== */
+
+.exercise-detail {
+    position: fixed;
+    inset: 0;
+    background-color: var(--bg-dark);
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.exercise-detail.hidden {
+    display: none;
+}
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    padding-top: max(var(--spacing-md), env(safe-area-inset-top));
+    background-color: var(--bg-darker);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.detail-back-btn {
+    background: none;
+    border: none;
+    color: var(--accent-primary);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    min-height: var(--touch-target-height);
+    min-width: 70px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.detail-back-btn:active {
+    background-color: rgba(var(--accent-primary-rgb), 0.1);
+}
+
+.detail-exercise-title {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--text-light);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.detail-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--spacing-md);
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+}
+
+.detail-gif-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, #1e2d3a, #2d3d4d);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.detail-gif-container::after {
+    content: '▶  Exercise Demo';
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    pointer-events: none;
+}
+
+.detail-gif-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.detail-warning-hidden {
+    display: none;
+}
+
+.detail-sets-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding-bottom: var(--spacing-lg);
+}
+
+/* Set rows in detail view */
+.detail-set {
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+}
+
+.detail-set.completed {
+    border-color: var(--accent-success);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-height: 56px;
+}
+
+.detail-set.pending {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    opacity: 0.45;
+    min-height: 56px;
+}
+
+.detail-set.active {
+    border-color: var(--accent-primary);
+}
+
+.set-status-icon {
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+
+.done-check {
+    color: var(--accent-success);
+}
+
+.active-dot {
+    color: var(--accent-primary);
+}
+
+.set-label {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.set-result {
+    margin-left: auto;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.set-pending-text {
+    margin-left: auto;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+.active-set-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.active-set-inputs {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.complete-set-btn {
+    width: 100%;
+    min-height: var(--touch-target-height);
+    font-size: var(--font-size-lg);
+}
+
+.all-sets-done {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.done-icon {
+    font-size: 48px;
+    color: var(--accent-success);
+    margin-bottom: var(--spacing-md);
+}
+
+.all-sets-done p {
+    font-size: var(--font-size-lg);
+    color: var(--text-light);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* ===================================================================
+   15. REST TIMER BAR (sticky bottom of detail view)
+   =================================================================== */
+
+.rest-timer-bar {
+    position: relative;
+    height: 64px;
+    background-color: var(--bg-darker);
+    border-top: 2px solid var(--accent-primary);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.rest-timer-bar.rest-timer-hidden {
+    display: none;
+}
+
+.rest-timer-bar.timer-done {
+    border-top-color: var(--accent-success);
+    animation: timer-pulse 0.6s ease 3;
+}
+
+@keyframes timer-pulse {
+    0%, 100% { background-color: var(--bg-darker); }
+    50% { background-color: rgba(76, 175, 80, 0.2); }
+}
+
+.rest-timer-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(var(--accent-primary-rgb), 0.12);
+    transition: width 1s linear;
+}
+
+.rest-timer-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 var(--spacing-md);
+    gap: var(--spacing-md);
+}
+
+.rest-timer-label {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    min-width: 36px;
+}
+
+.rest-timer-display {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--accent-primary);
+    flex: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.rest-timer-bar.timer-done .rest-timer-display {
+    color: var(--accent-success);
+}
+
+.skip-rest-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    min-height: 36px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.skip-rest-btn:active {
+    background-color: var(--bg-card);
+}
+
+/* ===================================================================
+   16. REST DURATION SELECTOR (workout screen)
+   =================================================================== */
+
+.rest-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.rest-selector-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.rest-selector-options {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.rest-opt-btn {
+    padding: var(--spacing-xs) var(--spacing-md);
+    min-height: 36px;
+    background-color: var(--bg-card);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.rest-opt-btn.active {
+    background-color: var(--accent-primary);
+    color: #fff;
+    border-color: var(--accent-primary);
+}
+
+.rest-opt-btn:active {
+    opacity: 0.7;
+}
+
+/* ===================================================================
+   17. TEMPO BADGE & COACHING NOTES
+   =================================================================== */
+
+.tempo-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-info);
+    border: 1px solid var(--accent-info);
+    border-radius: 20px;
+    padding: 1px 8px;
+    margin-left: var(--spacing-sm);
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.exercise-note {
+    background-color: rgba(74, 158, 255, 0.1);
+    border-left: 3px solid var(--accent-info);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+.detail-note-hidden {
+    display: none;
+}
+
+/* Per-side (Left/Right) input layout */
+.side-inputs {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+/* ===================================================================
+   18. WARM-UP SECTION (workout screen)
+   =================================================================== */
+
+.warmup-container {
+    margin-bottom: var(--spacing-lg);
+}
+
+.warmup-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-md);
+    min-height: var(--touch-target-height);
+    color: var(--text-light);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.warmup-toggle-icon {
+    transition: transform 0.2s ease;
+    color: var(--text-muted);
+}
+
+.warmup-toggle.expanded .warmup-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.warmup-list {
+    display: none;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.warmup-list.expanded {
+    display: flex;
+}
+
+.warmup-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.warmup-item.done {
+    border-color: var(--accent-success);
+    opacity: 0.6;
+}
+
+.warmup-item-thumb {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e2d3a, #2d3d4d);
+}
+
+.warmup-item-thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.warmup-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.warmup-item-name {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.warmup-item-reps {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.warmup-item-check {
+    flex-shrink: 0;
+    font-size: var(--font-size-lg);
+    color: var(--accent-success);
+    width: 24px;
+    text-align: center;
+}
+
+/* ===================================================================
+   19. INFO PAGE (nutrition & training-timing guidance)
+   =================================================================== */
+
+.info-section {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.info-section h3 {
+    font-size: var(--font-size-lg);
+    color: var(--accent-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.info-section ul {
+    padding-left: var(--spacing-lg);
+    color: var(--text-light);
+}
+
+.info-section li {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.5;
+}
+
+.info-credit {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-lg) 0;
+}
+
+.info-credit a {
+    color: var(--accent-primary);
+}

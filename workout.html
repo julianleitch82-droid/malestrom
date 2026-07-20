@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Malestrom - Active Workout">
+    <meta name="theme-color" content="#0d0d0d">
+    <title>Malestrom - Active Workout</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Malestrom">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+
+        <!-- Header with navigation -->
+        <header class="header">
+            <h1 class="app-title">💪 Malestrom</h1>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">← Back</a>
+            </nav>
+        </header>
+
+        <!-- Main content area -->
+        <main class="main-content">
+
+            <!-- Active Workout Screen -->
+            <section id="workout-screen" class="screen active">
+
+                <!-- Workout header showing the day and current date -->
+                <div class="workout-header">
+                    <h2 id="workout-day-title">Workout</h2>
+                    <p id="workout-date" class="workout-date"></p>
+                </div>
+
+                <!-- Progress indicator: current exercise / total exercises -->
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <p id="progress-text" class="progress-text"></p>
+
+                <!-- Rest duration selector -->
+                <div class="rest-selector">
+                    <span class="rest-selector-label">Rest</span>
+                    <div class="rest-selector-options">
+                        <button class="rest-opt-btn" data-seconds="30">30s</button>
+                        <button class="rest-opt-btn" data-seconds="60">60s</button>
+                        <button class="rest-opt-btn" data-seconds="90">90s</button>
+                        <button class="rest-opt-btn" data-seconds="120">2m</button>
+                        <button class="rest-opt-btn" data-seconds="180">3m</button>
+                    </div>
+                </div>
+
+                <!-- Warm-up section — populated by app.js from PROGRAM.days[].warmup -->
+                <div id="warmup-container" class="warmup-container"></div>
+
+                <!-- Main exercises list container -->
+                <div id="exercises-container" class="exercises-container">
+                    <!-- Exercises will be inserted here by JavaScript -->
+                </div>
+
+                <!-- Action buttons at the bottom -->
+                <div class="workout-actions">
+                    <button id="complete-workout-btn" class="btn btn-primary btn-large">
+                        ✓ Complete Workout
+                    </button>
+                    <button id="cancel-workout-btn" class="btn btn-secondary btn-large">
+                        Cancel
+                    </button>
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- Exercise Detail Overlay (full-screen takeover) -->
+        <div id="exercise-detail" class="exercise-detail hidden">
+            <div class="detail-header">
+                <button id="detail-back-btn" class="detail-back-btn">← Back</button>
+                <h2 id="detail-exercise-name" class="detail-exercise-title"></h2>
+            </div>
+            <div class="detail-body">
+                <div class="detail-gif-container">
+                    <video id="detail-video" src="videos/demo.mp4"
+                           class="detail-gif-img" autoplay loop muted playsinline></video>
+                </div>
+                <div id="detail-warning" class="exercise-warning detail-warning-hidden"></div>
+                <div id="detail-note" class="exercise-note detail-note-hidden"></div>
+                <div id="detail-sets-container" class="detail-sets-container"></div>
+            </div>
+            <div id="rest-timer-bar" class="rest-timer-bar rest-timer-hidden">
+                <div id="rest-timer-fill" class="rest-timer-fill"></div>
+                <div class="rest-timer-content">
+                    <span class="rest-timer-label">REST</span>
+                    <span id="rest-timer-display" class="rest-timer-display">1:30</span>
+                    <button id="skip-rest-btn" class="skip-rest-btn">Skip</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Load the main app logic -->
+    <script src="app.js"></script>
+    <script>
+        // Initialize the workout screen when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // This will be handled by the app.js file which manages the workout flow
+            console.log('Workout screen loaded');
+        });
+    </script>
+</body>
+</html>

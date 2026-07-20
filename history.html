@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Malestrom - History">
+    <meta name="theme-color" content="#0d0d0d">
+    <title>Malestrom - History</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Malestrom">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+
+        <!-- Header with navigation -->
+        <header class="header">
+            <h1 class="app-title">💪 Malestrom</h1>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">← Back</a>
+            </nav>
+        </header>
+
+        <!-- Main content area -->
+        <main class="main-content">
+
+            <!-- History Screen -->
+            <section id="history-screen" class="screen active">
+
+                <h2 class="section-title">Workout History</h2>
+
+                <!-- Filter options for viewing specific days — populated by app.js from PROGRAM.days -->
+                <div id="filter-buttons" class="filter-buttons"></div>
+
+                <!-- History sessions list -->
+                <div id="history-container" class="history-container">
+                    <div class="empty-state">
+                        <p>No workouts logged yet.</p>
+                        <p class="empty-state-hint">Start a workout on the home screen to see your history here.</p>
+                    </div>
+                </div>
+
+                <!-- Session details modal (hidden by default, shown when user taps a session) -->
+                <div id="session-modal" class="modal hidden">
+                    <div class="modal-content">
+                        <button class="modal-close" aria-label="Close">&times;</button>
+                        <h3 id="modal-session-title">Session Details</h3>
+                        
+                        <!-- Exercise details will be inserted here -->
+                        <div id="modal-exercises" class="modal-exercises">
+                        </div>
+
+                        <button class="btn btn-primary" id="modal-close-btn">Close</button>
+                    </div>
+                </div>
+
+                <!-- Modal overlay (semi-transparent background) -->
+                <div id="modal-overlay" class="modal-overlay hidden"></div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- Load the main app logic -->
+    <script src="app.js"></script>
+    <script>
+        // Initialize the history screen when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // This will be handled by the app.js file which manages the history view
+            console.log('History screen loaded');
+        });
+    </script>
+</body>
+</html>

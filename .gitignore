@@ -1,0 +1,11 @@
+# Unrelated Python virtualenv sitting in this folder — not part of the static site
+.venv/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+
+# Local Claude Code settings (user-specific, not project config)
+.claude/settings.local.json
