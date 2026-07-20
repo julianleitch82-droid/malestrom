@@ -805,11 +805,11 @@ function renderActiveSetInputs(exercise) {
             ${weightInput}
             <div class="side-inputs">
                 <div class="input-group">
-                    <label>Reps (Left)</label>
+                    <label>Reps (L)</label>
                     <input type="number" id="active-reps-l" placeholder="${exercise.reps}" inputmode="numeric">
                 </div>
                 <div class="input-group">
-                    <label>Reps (Right)</label>
+                    <label>Reps (R)</label>
                     <input type="number" id="active-reps-r" placeholder="${exercise.reps}" inputmode="numeric">
                 </div>
             </div>
