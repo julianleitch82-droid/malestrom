@@ -181,8 +181,12 @@ an app rewrite. An in-app UI for switching between multiple *saved* programs is 
 ## 7. Design Guidelines
 
 - **Mobile-first:** designed for one-handed use in the gym
-- **Dark mode:** easier to read under gym lighting
-- **Large tap targets:** buttons and inputs sized for sweaty fingers
+- **Follows system theme:** the app tracks the phone/browser's light/dark setting live via
+  `prefers-color-scheme` (no in-app toggle) — same CSS variable names in `style.css`, swapped
+  values under a `@media (prefers-color-scheme: light)` block. The pink brand accent stays
+  constant across both themes; only backgrounds/text/border shades change.
+- **Large tap targets:** buttons and inputs sized for sweaty fingers, weight input sized wider
+  than reps (`flex: 1.5` vs `1`) for comfortable typing of decimal values like "22.5"
 - **Minimal navigation:** get in, log the workout, get out
 - **Colours:** simple, clean — no unnecessary decoration
 
@@ -286,6 +290,9 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 | 9 | PWA polish — icons, offline, install prompt | Complete |
 | 10 | Per-exercise MP4 video files replacing the shared placeholder (film PT demos, export as H.264, store in `videos/`) | Not started — see `videos/README.md` for the filename mapping |
 | 11 | Ingest Jess Males Block 1 program — data-driven `PROGRAM`, warm-ups, E/T notation, tempo/coaching notes, info page, pink/black rebrand as "Malestrom" | Complete |
-| 12 | Deploy to Netlify for a stable HTTPS URL + iOS "Add to Home Screen" | In progress |
+| 12 | Deploy to Netlify for a stable HTTPS URL + iOS "Add to Home Screen" | Complete — live at malestrom.netlify.app |
+| 13 | Exercise detail video `onerror` fallback — full-screen detail view wasn't wired to fall back to `demo.mp4` like the list thumbnails were, so it silently showed nothing for any exercise without a real filmed clip | Complete |
+| 14 | Gym-testing fixes: wider weight input, system light/dark theme via `prefers-color-scheme` | Complete |
+| 15 | Warm-up "dropdown"/cycling behaviour reported from gym testing — description doesn't match the current checklist implementation (no dropdown/cycling exists in the code); clarifying with user before building | Blocked — pending clarification |
 
 **Note:** Phase 7 will use [Chart.js](https://www.chartjs.org/) (CDN) for graph rendering — no install required.

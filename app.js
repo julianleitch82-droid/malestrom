@@ -750,7 +750,7 @@ function renderActiveSetInputs(exercise) {
 
     const lastWeight = getLastWeightForExercise(currentDay, exercise.id) ?? exercise.startWeight ?? 0;
     const weightInput = `
-        <div class="input-group">
+        <div class="input-group input-group-weight">
             <label>Weight (${exercise.unit})</label>
             <input type="number" id="active-weight" placeholder="${lastWeight}" step="0.5" inputmode="decimal">
         </div>
