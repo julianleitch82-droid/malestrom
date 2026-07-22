@@ -393,8 +393,7 @@ function initHomeScreen() {
             return `
                 <div class="day-card" data-day="${day.id}">
                     <div class="day-header">
-                        <h3 class="day-letter">Day ${day.id}</h3>
-                        <p class="day-focus">${day.name}</p>
+                        <h3 class="day-letter">${day.name}</h3>
                     </div>
                     <div class="day-info">
                         <p class="last-completed">${lastText}</p>
