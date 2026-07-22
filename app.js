@@ -434,6 +434,7 @@ function initHomeScreen() {
 // In-session state (cleared on each new workout)
 let sessionData = {};           // { exerciseIndex: { setNum: {...} } }
 let currentExerciseIndex = null;
+let editingSetNum = null;       // set number currently being corrected, or null
 let currentDay = null;
 let restTimerInterval = null;
 let restTimeRemaining = 0;
@@ -694,6 +695,7 @@ function getLastWeightForExercise(dayId, exerciseId) {
 function openExerciseDetail(exerciseIndex) {
     const exercise = getDay(currentDay).exercises[exerciseIndex];
     currentExerciseIndex = exerciseIndex;
+    editingSetNum = null;
 
     document.getElementById('detail-exercise-name').textContent = exercise.name;
 
@@ -735,6 +737,7 @@ function closeExerciseDetail() {
     stopRestTimer();
     document.getElementById('exercise-detail').classList.add('hidden');
     currentExerciseIndex = null;
+    editingSetNum = null;
     if (currentDay) renderExerciseList(getDay(currentDay).exercises);
 }
 
@@ -752,13 +755,41 @@ function renderDetailSets(exercise, exerciseIndex) {
             ? exercise.variantLabels[setNum - 1]
             : `Set ${setNum}`;
 
-        if (data) {
+        if (data && setNum === editingSetNum) {
+            // Already-logged set, currently being corrected
+            setEl.className = 'detail-set active';
+            setEl.innerHTML = `
+                <div class="active-set-header">
+                    <span class="set-status-icon active-dot">●</span>
+                    <span class="set-label">Editing ${setLabel}</span>
+                </div>
+                <div class="active-set-inputs">${renderActiveSetInputs(exercise, setNum, data)}</div>
+                <div class="edit-set-actions">
+                    <button class="btn btn-secondary cancel-edit-btn">Cancel</button>
+                    <button class="btn btn-primary save-edit-btn">✓ Save</button>
+                </div>
+            `;
+            setEl.querySelector('.save-edit-btn').addEventListener('click', () => {
+                saveSetEdit(exerciseIndex, setNum, exercise);
+            });
+            setEl.querySelector('.cancel-edit-btn').addEventListener('click', () => {
+                editingSetNum = null;
+                renderDetailSets(exercise, exerciseIndex);
+            });
+        } else if (data) {
+            // Already-logged set — tap to correct it
             setEl.className = 'detail-set completed';
             setEl.innerHTML = `
                 <span class="set-status-icon done-check">✓</span>
                 <span class="set-label">${setLabel}</span>
                 <span class="set-result">${formatSetResult(exercise, data)}</span>
+                <span class="set-edit-icon" aria-hidden="true">✎</span>
             `;
+            setEl.addEventListener('click', () => {
+                if (editingSetNum !== null) return; // finish/cancel the current edit first
+                editingSetNum = setNum;
+                renderDetailSets(exercise, exerciseIndex);
+            });
         } else if (setNum === firstPending) {
             setEl.className = 'detail-set active';
             setEl.innerHTML = `
@@ -766,7 +797,7 @@ function renderDetailSets(exercise, exerciseIndex) {
                     <span class="set-status-icon active-dot">●</span>
                     <span class="set-label">${setLabel}</span>
                 </div>
-                <div class="active-set-inputs">${renderActiveSetInputs(exercise)}</div>
+                <div class="active-set-inputs">${renderActiveSetInputs(exercise, setNum)}</div>
                 <button class="btn btn-primary complete-set-btn">✓ Complete ${exercise.sideMode === 'variants' ? setLabel : `Set ${setNum}`}</button>
             `;
             setEl.querySelector('.complete-set-btn').addEventListener('click', () => {
@@ -784,7 +815,7 @@ function renderDetailSets(exercise, exerciseIndex) {
         container.appendChild(setEl);
     }
 
-    if (!firstPending) {
+    if (!firstPending && editingSetNum === null) {
         const doneEl = document.createElement('div');
         doneEl.className = 'all-sets-done';
         doneEl.innerHTML = `
@@ -798,21 +829,23 @@ function renderDetailSets(exercise, exerciseIndex) {
     }
 }
 
-function renderActiveSetInputs(exercise) {
+function renderActiveSetInputs(exercise, setNum, existingData) {
     if (exercise.sideMode === 'variants') {
+        const seconds = existingData?.seconds;
         return `
             <div class="input-group">
                 <label>Hold (seconds)</label>
-                <input type="number" id="active-seconds" placeholder="${exercise.holdSeconds}" inputmode="numeric">
+                <input type="number" id="set-seconds-${setNum}" placeholder="${exercise.holdSeconds}" ${seconds != null ? `value="${seconds}"` : ''} inputmode="numeric">
             </div>
         `;
     }
 
-    const lastWeight = getLastWeightForExercise(currentDay, exercise.id) ?? exercise.startWeight ?? 0;
+    const weightValue = existingData?.weight;
+    const lastWeight = weightValue ?? (getLastWeightForExercise(currentDay, exercise.id) ?? exercise.startWeight ?? 0);
     const weightInput = `
         <div class="input-group input-group-weight">
             <label>Weight (${exercise.unit})</label>
-            <input type="number" id="active-weight" placeholder="${lastWeight}" step="0.5" inputmode="decimal">
+            <input type="number" id="set-weight-${setNum}" placeholder="${lastWeight}" ${weightValue != null ? `value="${weightValue}"` : ''} step="0.5" inputmode="decimal">
         </div>
     `;
 
@@ -822,11 +855,11 @@ function renderActiveSetInputs(exercise) {
             <div class="side-inputs">
                 <div class="input-group">
                     <label>Reps (L)</label>
-                    <input type="number" id="active-reps-l" placeholder="${exercise.reps}" inputmode="numeric">
+                    <input type="number" id="set-reps-l-${setNum}" placeholder="${exercise.reps}" ${existingData ? `value="${existingData.repsL}"` : ''} inputmode="numeric">
                 </div>
                 <div class="input-group">
                     <label>Reps (R)</label>
-                    <input type="number" id="active-reps-r" placeholder="${exercise.reps}" inputmode="numeric">
+                    <input type="number" id="set-reps-r-${setNum}" placeholder="${exercise.reps}" ${existingData ? `value="${existingData.repsR}"` : ''} inputmode="numeric">
                 </div>
             </div>
         `;
@@ -836,7 +869,7 @@ function renderActiveSetInputs(exercise) {
         ${weightInput}
         <div class="input-group">
             <label>Reps${exercise.sideMode === 'totalCombined' ? ' (total)' : ''}</label>
-            <input type="number" id="active-reps" placeholder="${exercise.reps}" inputmode="numeric">
+            <input type="number" id="set-reps-${setNum}" placeholder="${exercise.reps}" ${existingData ? `value="${existingData.reps}"` : ''} inputmode="numeric">
         </div>
     `;
 }
@@ -854,33 +887,40 @@ function formatSetResult(exercise, data) {
     return `${data.weight} ${exercise.unit} × ${data.reps} reps`;
 }
 
-function completeSet(exerciseIndex, setNum, exercise) {
-    let entry;
-
+/**
+ * Reads whatever set-logging inputs are currently rendered for `setNum`
+ * (shared by completeSet and saveSetEdit — the two only differ in what
+ * happens after the entry is captured).
+ */
+function readSetInputs(exercise, setNum) {
     if (exercise.sideMode === 'variants') {
-        const secondsInput = document.getElementById('active-seconds');
+        const secondsInput = document.getElementById(`set-seconds-${setNum}`);
         const seconds = secondsInput.value !== ''
             ? parseInt(secondsInput.value)
             : parseInt(secondsInput.placeholder) || exercise.holdSeconds;
-        entry = { seconds };
-    } else {
-        const weightInput = document.getElementById('active-weight');
-        const weight = weightInput.value !== ''
-            ? parseFloat(weightInput.value)
-            : parseFloat(weightInput.placeholder) || exercise.startWeight || 0;
-
-        if (exercise.sideMode === 'perSide') {
-            const repsLInput = document.getElementById('active-reps-l');
-            const repsRInput = document.getElementById('active-reps-r');
-            const repsL = repsLInput.value !== '' ? parseInt(repsLInput.value) : parseInt(repsLInput.placeholder) || exercise.reps;
-            const repsR = repsRInput.value !== '' ? parseInt(repsRInput.value) : parseInt(repsRInput.placeholder) || exercise.reps;
-            entry = { weight, repsL, repsR };
-        } else {
-            const repsInput = document.getElementById('active-reps');
-            const reps = repsInput.value !== '' ? parseInt(repsInput.value) : parseInt(repsInput.placeholder) || exercise.reps;
-            entry = { weight, reps };
-        }
+        return { seconds };
     }
+
+    const weightInput = document.getElementById(`set-weight-${setNum}`);
+    const weight = weightInput.value !== ''
+        ? parseFloat(weightInput.value)
+        : parseFloat(weightInput.placeholder) || exercise.startWeight || 0;
+
+    if (exercise.sideMode === 'perSide') {
+        const repsLInput = document.getElementById(`set-reps-l-${setNum}`);
+        const repsRInput = document.getElementById(`set-reps-r-${setNum}`);
+        const repsL = repsLInput.value !== '' ? parseInt(repsLInput.value) : parseInt(repsLInput.placeholder) || exercise.reps;
+        const repsR = repsRInput.value !== '' ? parseInt(repsRInput.value) : parseInt(repsRInput.placeholder) || exercise.reps;
+        return { weight, repsL, repsR };
+    }
+
+    const repsInput = document.getElementById(`set-reps-${setNum}`);
+    const reps = repsInput.value !== '' ? parseInt(repsInput.value) : parseInt(repsInput.placeholder) || exercise.reps;
+    return { weight, reps };
+}
+
+function completeSet(exerciseIndex, setNum, exercise) {
+    const entry = readSetInputs(exercise, setNum);
 
     if (!sessionData[exerciseIndex]) sessionData[exerciseIndex] = {};
     sessionData[exerciseIndex][setNum] = entry;
@@ -890,6 +930,20 @@ function completeSet(exerciseIndex, setNum, exercise) {
     if (getCompletedSetCount(exerciseIndex) < exercise.sets) {
         startRestTimer();
     }
+}
+
+/**
+ * Corrects a set that was already logged this session. Deliberately does
+ * NOT start the rest timer or otherwise touch progress through the rest of
+ * the sets — this is a correction, not new logging. Nothing is written to
+ * localStorage here; sessionData only gets persisted as a whole when
+ * "Complete Workout" is tapped, so the corrected value flows through
+ * automatically whenever that happens.
+ */
+function saveSetEdit(exerciseIndex, setNum, exercise) {
+    sessionData[exerciseIndex][setNum] = readSetInputs(exercise, setNum);
+    editingSetNum = null;
+    renderDetailSets(exercise, exerciseIndex);
 }
 
 function initAudioContext() {

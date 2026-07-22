@@ -126,10 +126,10 @@ A full-screen takeover opened by tapping any exercise in the list. This is the o
   - `E` (per side): one weight input + separate Left/Right reps inputs, logged independently
   - `T` (total combined): one weight input + one reps input, labeled "(total)"
   - Timed variants (e.g. Plank & Side Plank): no weight field, one seconds input per named variant hold
-  - Completed sets: shown in green with the logged result formatted per the above
+  - Completed sets: shown in green with the logged result formatted per the above. **Tappable** — opens the same inputs pre-filled with the logged values (rather than placeholders) plus Save/Cancel buttons, so a mis-logged set can be corrected without redoing the whole exercise. Only one set can be edited at a time; editing doesn't restart the rest timer or disturb which set is "active" next. Since `sessionData` isn't written to `localStorage` until "Complete Workout" is tapped (see 8.2), a correction here never needs to touch history separately — the fixed value just flows through whatever gets saved at the end
   - Active set (next uncompleted): the appropriate inputs + "Complete Set" button
   - Pending sets: dimmed, no interaction until prior set is completed
-- **Default values:** if the user leaves weight or reps blank and taps "Complete Set", the app uses the placeholder value shown in the input — either the last session's logged weight for that exercise, or the starting weight from the program
+- **Default values:** if the user leaves weight or reps blank and taps "Complete Set" (or Save, when editing), the app uses the placeholder value shown in the input — either the last session's logged weight for that exercise, or the starting weight from the program
 - **Rest timer bar** (see 5.2b): always visible at the bottom of this screen
 - When all sets are done, an "All sets complete!" confirmation is shown with a back button
 
@@ -306,5 +306,6 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 | 17 | Warm-up cardio line moved from the header into the checklist as the first item (was previously baked into the collapsible header text) | Complete |
 | 18 | "Force Refresh App" button on the Info screen — unregisters the service worker and clears Cache Storage (keeps `localStorage`/workout history intact) then reloads, so a stuck iOS service worker doesn't require digging through phone Settings → Website Data | Complete |
 | 19 | Warm-up round-completion "blink" — the whole warm-up card pulses opacity 3x as confirmation before the checklist resets/advances, instead of resetting instantly; locked against taps during the animation; applies identically to every round including the final one | Complete |
+| 20 | Completed sets are now editable — tap a logged set to correct weight/reps (pre-filled, not placeholders) instead of it being display-only; input element IDs scoped per set number so the edited row and the still-active next row never collide; edit doesn't touch localStorage directly or restart the rest timer, since sessionData is the single source of truth until "Complete Workout" persists it all at once | Complete |
 
 **Note:** Phase 7 will use [Chart.js](https://www.chartjs.org/) (CDN) for graph rendering — no install required.

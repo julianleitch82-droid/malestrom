@@ -947,6 +947,20 @@ input:focus-visible {
     align-items: center;
     gap: var(--spacing-md);
     min-height: 56px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.detail-set.completed:active {
+    border-color: var(--accent-primary);
+    background-color: rgba(var(--accent-primary-rgb), 0.05);
+}
+
+.set-edit-icon {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
 }
 
 .detail-set.pending {
@@ -1011,6 +1025,15 @@ input:focus-visible {
     width: 100%;
     min-height: var(--touch-target-height);
     font-size: var(--font-size-lg);
+}
+
+.edit-set-actions {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.edit-set-actions .btn {
+    flex: 1;
 }
 
 .all-sets-done {
