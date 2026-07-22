@@ -14,12 +14,11 @@
  * 
  */
 
-const CACHE_NAME = 'workout-tracker-v2';
+const CACHE_NAME = 'workout-tracker-v3';
 const urlsToCache = [
     './',
     './index.html',
     './workout.html',
-    './history.html',
     './info.html',
     './style.css',
     './app.js',

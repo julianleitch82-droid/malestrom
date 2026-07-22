@@ -21,7 +21,7 @@ A long-term personal training companion for tracking a structured 3-day full bod
 - Log weights, sets and reps as they happen
 - Have a rest timer that starts only after the user marks a set complete. The timer should show a small alert when it finishes. Completion can be marked by a button, checkbox, or similar control.
 - Show previous session data so the user knows what they lifted last time.
-- Support gradual progression and visualize improvement over time via history collection. Show a progress graph directly above each exercise on the active workout screen.
+- Let the user see how their weight for an exercise has moved over recent months, shown directly on that exercise's own logging screen — as raw data, not an interpreted "progress" or "regression" narrative.
 - Allow users to flag exercises that require care due to injuries or limitations.
 - Serve as a foundation that can be extended with new features and programs as training evolves
 
@@ -144,21 +144,40 @@ A persistent bar docked to the bottom of the Exercise Detail View — it never s
 - "Skip" button dismisses the timer early
 - Timer stops when the user taps "← Back" to return to the exercise list
 
-### 5.3 Exercise History
-- Tap any exercise name to see last 5 sessions of logged data
-- Shows date, weight, sets completed
+### 5.3 Weight Trend Chart
 
-### 5.4 Progress Graph
-- Line graph showing estimated 1-rep max (e1RM) over time, calculated from logged weight and reps using the Epley formula: `weight × (1 + reps/30)`
-- X-axis: date of each session; Y-axis: e1RM in kg
-- Falls back to a simple weight-over-time view if only 1 set per session is logged
+There is no longer a standalone History screen — it was a narrow, session-by-session list/modal
+that didn't answer the question the user actually wanted answered ("how has this exercise been
+trending"), so it was removed and replaced by a small chart built directly into the Exercise
+Detail View instead.
 
-### 5.5 PWA Setup
+- Appears at the bottom of the scrollable exercise detail panel (below the set rows, above the
+  fixed rest-timer bar), so it's visible without leaving the screen you're actively logging on
+- One point per **session** (not per set) — the heaviest weight logged for that exercise that
+  session. This is a deliberate small piece of curation (agreed with the user) rather than
+  plotting every individual set, to keep the chart readable
+- Covers a rolling last-6-months window from today, across *all* days/sessions the exercise
+  appears in (not just the current day)
+- X-axis: session date. Y-axis: weight, in the exercise's own unit (kg, or "bodyweight/kg" for
+  a couple of bodyweight-optional exercises)
+- **Deliberately shows raw data only** — no estimated 1-rep max, no Epley formula, no "you're
+  up/down X%" framing. Just what was actually lifted, session by session. This replaces the
+  original e1RM-based "Progress Graph" concept, which was never built
+- Not shown at all for timed-hold exercises (Plank & Side Plank) — there's no weight value to
+  plot for those
+- Empty state ("No previous sessions logged yet for this exercise") when there's no qualifying
+  data yet, rather than showing a blank chart
+- Rendered as a small hand-rolled inline SVG line+dot chart in `app.js` — deliberately not a
+  charting library like Chart.js pulled from a CDN, since that would require network access and
+  break offline-first use on a first-ever load without connectivity. No interactivity needed
+  (no zoom/hover/tooltips) so a library would be pure overhead here anyway
+
+### 5.4 PWA Setup
 - Manifest file so the app can be installed from Safari
 - App icon placeholder
 - Works offline after first load
 
-### 5.6 Info Screen
+### 5.5 Info Screen
 - Static "Diplomat Health Type" nutrition and training-timing guidance from the PT program (not gamified/logged)
 - **Force Refresh App button**: unregisters the service worker and clears Cache Storage directly via the Service Worker API, then navigates to a freshly-fetched home screen. Deliberately leaves `localStorage` untouched so logged workout history survives. Exists because iOS Safari's per-site "clear website data" has proven unreliable in practice (deleted entries can silently repopulate from a backgrounded app instance), whose only reliable fallback is wiping *all* Safari site data — this button avoids needing that
 
@@ -173,8 +192,11 @@ A persistent bar docked to the bottom of the Exercise Detail View — it never s
 - Photo progress tracking
 - Notes field per session
 - App Store / Play Store distribution (staying on PWA / Add to Home Screen)
-- Progress graph (e1RM over time via Chart.js) — see Phase 7, not started
+- Estimated 1-rep max (e1RM) / derived "progress" metrics — the weight trend chart (5.3) shows
+  raw logged weight by design, not an interpreted progress score
 - Persisting warm-up completion to history (currently a session-only checklist, not saved)
+- A dedicated multi-session browsing view (the old History screen) — superseded by the
+  per-exercise weight trend chart; may be reconsidered later if raw session browsing is missed
 
 **Note:** "Program switching" was previously listed here as out of scope, but as of v2.0 `PROGRAM`
 is fully data-driven (see Section 8) specifically so a future block/cycle can replace it without
@@ -260,8 +282,7 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 ```
 /Gym_App
   index.html          ← Home screen
-  workout.html        ← Active workout screen
-  history.html        ← Exercise history view
+  workout.html        ← Active workout screen (incl. per-exercise weight trend chart)
   info.html           ← Nutrition & training-timing guidance (Diplomat Health Type)
   style.css           ← Global styles
   app.js              ← Core logic, PROGRAM data, and localStorage handling
@@ -293,8 +314,8 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 | 4 | localStorage save/load | Complete |
 | 5 | Previous session pre-fill (last weight shown as input placeholder) | Complete |
 | 6 | Rest timer — sticky bar in detail view, configurable, vibration alert, skip | Complete |
-| 7 | Progress graph per exercise (e1RM over time via Chart.js) | Not started |
-| 8 | Exercise history view | Complete |
+| 7 | Progress graph per exercise (e1RM over time via Chart.js) | Superseded by Phase 22 — implemented as a raw weight-trend chart instead, no e1RM/derived metric, no Chart.js |
+| 8 | Exercise history view | Superseded by Phase 22 — the standalone History screen was removed in favour of the per-exercise chart |
 | 9 | PWA polish — icons, offline, install prompt | Complete |
 | 10 | Per-exercise MP4 video files replacing the shared placeholder (film PT demos, export as H.264, store in `videos/`) | Not started — see `videos/README.md` for the filename mapping |
 | 11 | Ingest Jess Males Block 1 program — data-driven `PROGRAM`, warm-ups, E/T notation, tempo/coaching notes, info page, pink/black rebrand as "Malestrom" | Complete |
@@ -308,5 +329,4 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 | 19 | Warm-up round-completion "blink" — the whole warm-up card pulses opacity 3x as confirmation before the checklist resets/advances, instead of resetting instantly; locked against taps during the animation; applies identically to every round including the final one | Complete |
 | 20 | Completed sets are now editable — tap a logged set to correct weight/reps (pre-filled, not placeholders) instead of it being display-only; input element IDs scoped per set number so the edited row and the still-active next row never collide; edit doesn't touch localStorage directly or restart the rest timer, since sessionData is the single source of truth until "Complete Workout" persists it all at once | Complete |
 | 21 | Home screen day-card heading now shows the workout name (e.g. "Chest / Shoulders / Triceps") instead of "Day A" — the old muscle-group subtitle line was dropped since the heading replaced it; the "A"/"B"/"C" day id is untouched everywhere it's used functionally (`data-day` attributes, localStorage `dayId`), only removed from this one piece of visible text | Complete |
-
-**Note:** Phase 7 will use [Chart.js](https://www.chartjs.org/) (CDN) for graph rendering — no install required.
+| 22 | Removed the standalone History screen (`history.html` deleted, nav/button references cleaned up) and replaced it with a per-exercise Weight Trend Chart at the bottom of the Exercise Detail View — one point per session (heaviest set that day), rolling 6-month window, raw data only (see 5.3). Hand-rolled inline SVG rather than Chart.js, to stay offline-safe. Service worker cache bumped to v3 | Complete |

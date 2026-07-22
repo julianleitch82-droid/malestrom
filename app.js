@@ -358,7 +358,7 @@ function getTodayDate() {
  * Navigate to a different page
  */
 function navigateTo(page) {
-    // page should be 'index.html', 'workout.html', 'history.html', or 'info.html'
+    // page should be 'index.html', 'workout.html', or 'info.html'
     window.location.href = page;
 }
 
@@ -416,14 +416,6 @@ function initHomeScreen() {
             navigateTo('workout.html');
         });
     });
-
-    // Add handler for view history button
-    const historyBtn = document.getElementById('view-history-btn');
-    if (historyBtn) {
-        historyBtn.addEventListener('click', () => {
-            navigateTo('history.html');
-        });
-    }
 }
 
 /* ===================================================================
@@ -717,6 +709,7 @@ function openExerciseDetail(exerciseIndex) {
     }
 
     renderDetailSets(exercise, exerciseIndex);
+    renderExerciseTrend(exercise);
     document.getElementById('exercise-detail').classList.remove('hidden');
 
     // Restart video from beginning (user gesture context — required for iOS autoplay)
@@ -738,6 +731,123 @@ function closeExerciseDetail() {
     currentExerciseIndex = null;
     editingSetNum = null;
     if (currentDay) renderExerciseList(getDay(currentDay).exercises);
+}
+
+/**
+ * One data point per session (not per set) — the heaviest weight logged for
+ * this exercise that day, across ALL days/sessions in the last `months`
+ * months (not just the current day), oldest first. Raw data only: no e1RM
+ * or other derived "progress" metric, per design intent — just what was
+ * actually lifted, session by session.
+ */
+function getWeightTrendForExercise(exerciseId, months) {
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - months);
+
+    return StorageManager.getSessions()
+        .filter(s => new Date(s.date) >= cutoff)
+        .map(session => {
+            const ex = session.exercises.find(e => e.id === exerciseId);
+            if (!ex || !ex.sets.length) return null;
+            const weights = ex.sets.map(s => s.weight).filter(w => typeof w === 'number');
+            if (!weights.length) return null;
+            return { date: session.date, weight: Math.max(...weights) };
+        })
+        .filter(Boolean)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
+/**
+ * Renders a small inline-SVG line chart into #detail-trend-container — a
+ * lightweight hand-rolled chart rather than a library like Chart.js, since
+ * pulling one in from a CDN would break the app's offline-first PWA design
+ * (nothing here needs interactivity, so it isn't worth the tradeoff).
+ * Skipped entirely for timed-hold exercises (Plank etc.) — there's no
+ * weight to plot.
+ */
+function renderExerciseTrend(exercise) {
+    const container = document.getElementById('detail-trend-container');
+    if (!container) return;
+
+    if (exercise.type === 'time') {
+        container.innerHTML = '';
+        return;
+    }
+
+    const points = getWeightTrendForExercise(exercise.id, 6);
+
+    if (points.length === 0) {
+        container.innerHTML = `
+            <div class="trend-section">
+                <h4 class="trend-title">Weight Trend (last 6 months)</h4>
+                <p class="trend-empty">No previous sessions logged yet for this exercise.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="trend-section">
+            <h4 class="trend-title">Weight Trend (last 6 months)</h4>
+            ${buildTrendSvg(points, exercise.unit)}
+        </div>
+    `;
+}
+
+function buildTrendSvg(points, unit) {
+    const W = 320, H = 160;
+    const padL = 34, padR = 12, padT = 12, padB = 22;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+
+    const dateMs = points.map(p => new Date(p.date + 'T00:00:00').getTime());
+    const weights = points.map(p => p.weight);
+
+    const minDate = Math.min(...dateMs);
+    const maxDate = Math.max(...dateMs);
+    const dateRange = maxDate - minDate || 1;
+
+    const minWeightRaw = Math.min(...weights);
+    const maxWeightRaw = Math.max(...weights);
+    const weightSpan = (maxWeightRaw - minWeightRaw) || Math.max(maxWeightRaw * 0.1, 1);
+    const minWeight = Math.max(0, minWeightRaw - weightSpan * 0.15);
+    const maxWeight = maxWeightRaw + weightSpan * 0.15;
+    const weightRange = (maxWeight - minWeight) || 1;
+
+    const xFor = (t) => padL + (points.length === 1 ? plotW / 2 : ((t - minDate) / dateRange) * plotW);
+    const yFor = (w) => padT + (1 - (w - minWeight) / weightRange) * plotH;
+
+    const coords = points.map((p, i) => ({ x: xFor(dateMs[i]), y: yFor(p.weight) }));
+    const linePoints = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+
+    const yLabelValues = [maxWeight, (maxWeight + minWeight) / 2, minWeight];
+    const fmtShort = (ms) => new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+    const gridlines = yLabelValues.map(w => {
+        const y = yFor(w).toFixed(1);
+        return `
+            <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" class="trend-gridline" />
+            <text x="${padL - 6}" y="${(parseFloat(y) + 3).toFixed(1)}" class="trend-axis-label" text-anchor="end">${Math.round(w)}</text>
+        `;
+    }).join('');
+
+    const dots = coords.map(c => `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3.5" class="trend-dot" />`).join('');
+
+    const dateLabels = `
+        <text x="${padL}" y="${H - 4}" class="trend-axis-label" text-anchor="start">${fmtShort(minDate)}</text>
+        ${points.length > 2 ? `<text x="${(padL + W - padR) / 2}" y="${H - 4}" class="trend-axis-label" text-anchor="middle">${fmtShort((minDate + maxDate) / 2)}</text>` : ''}
+        ${points.length > 1 ? `<text x="${W - padR}" y="${H - 4}" class="trend-axis-label" text-anchor="end">${fmtShort(maxDate)}</text>` : ''}
+    `;
+
+    return `
+        <svg viewBox="0 0 ${W} ${H}" class="trend-svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Weight trend chart">
+            ${gridlines}
+            ${points.length > 1 ? `<polyline points="${linePoints}" class="trend-line" fill="none" />` : ''}
+            ${dots}
+            ${dateLabels}
+        </svg>
+        <p class="trend-unit-label">Weight (${unit})</p>
+    `;
 }
 
 function renderDetailSets(exercise, exerciseIndex) {
@@ -1093,154 +1203,7 @@ function completeWorkout(day) {
 }
 
 /* ===================================================================
-   6. HISTORY SCREEN LOGIC
-   =================================================================== */
-
-/**
- * Initialize the history screen
- */
-function initHistoryScreen() {
-    console.log('Initializing history screen...');
-
-    const filterContainer = document.getElementById('filter-buttons');
-    if (filterContainer) {
-        const buttons = [{ id: 'all', label: 'All Days' }, ...PROGRAM.days.map(d => ({ id: d.id, label: `Day ${d.id}` }))];
-        filterContainer.innerHTML = buttons.map((b, idx) => `
-            <button class="filter-btn${idx === 0 ? ' active' : ''}" data-filter="${b.id}">${b.label}</button>
-        `).join('');
-    }
-
-    renderHistory('all');
-
-    // Add filter button handlers
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            // Update active state
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-
-            // Re-render with filter
-            const filter = e.target.dataset.filter;
-            renderHistory(filter);
-        });
-    });
-}
-
-/**
- * Render the history of all sessions
- */
-function renderHistory(filter) {
-    const container = document.getElementById('history-container');
-    if (!container) return;
-
-    let sessions = StorageManager.getSessions();
-
-    // Filter by day if specified
-    if (filter !== 'all') {
-        sessions = sessions.filter(s => s.dayId === filter);
-    }
-
-    // Sort by date (newest first)
-    sessions.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    // Render
-    if (sessions.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <p>No workouts logged yet.</p>
-                <p class="empty-state-hint">Start a workout on the home screen to see your history here.</p>
-            </div>
-        `;
-        return;
-    }
-
-    container.innerHTML = sessions.map(session => `
-        <div class="session-item" data-session-id="${session.id}">
-            <div class="session-info">
-                <div class="session-day">Day ${session.dayId} — ${session.dayName}</div>
-                <div class="session-date">${formatDateReadable(session.date)} • ${session.exercises.length} exercises</div>
-            </div>
-            <div class="session-arrow">›</div>
-        </div>
-    `).join('');
-
-    // Add click handlers
-    document.querySelectorAll('.session-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const sessionId = item.dataset.sessionId;
-            const session = StorageManager.getSessions().find(s => s.id === sessionId);
-            if (session) {
-                showSessionModal(session);
-            }
-        });
-    });
-}
-
-/**
- * Show session details in a modal
- */
-function showSessionModal(session) {
-    const modal = document.getElementById('session-modal');
-    const overlay = document.getElementById('modal-overlay');
-    const title = document.getElementById('modal-session-title');
-    const content = document.getElementById('modal-exercises');
-
-    if (!modal || !overlay || !title || !content) return;
-
-    // Set title
-    title.textContent = `Day ${session.dayId} — ${session.dayName} — ${formatDateReadable(session.date)}`;
-
-    // Render exercises
-    content.innerHTML = session.exercises.map(exercise => {
-        const setsHTML = exercise.sets.map(set => `
-            <div class="modal-set">${formatHistorySetLine(exercise, set)}</div>
-        `).join('');
-
-        return `
-            <div class="modal-exercise-item">
-                <div class="modal-exercise-name">${exercise.name}</div>
-                ${setsHTML}
-            </div>
-        `;
-    }).join('');
-
-    // Show modal
-    modal.classList.remove('hidden');
-    overlay.classList.remove('hidden');
-
-    // Add close handlers
-    const closeBtn = document.querySelector('.modal-close');
-    const closeBtnBottom = document.getElementById('modal-close-btn');
-
-    const closeModal = () => {
-        modal.classList.add('hidden');
-        overlay.classList.add('hidden');
-    };
-
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    if (closeBtnBottom) closeBtnBottom.addEventListener('click', closeModal);
-    overlay.addEventListener('click', closeModal);
-}
-
-function formatHistorySetLine(exercise, set) {
-    const label = exercise.sideMode === 'variants' && exercise.variantLabels
-        ? exercise.variantLabels[set.setNumber - 1]
-        : `Set ${set.setNumber}`;
-
-    if (exercise.sideMode === 'variants') {
-        return `${label}: ${set.seconds}s`;
-    }
-    if (exercise.sideMode === 'perSide') {
-        return `${label}: ${set.weight} ${exercise.unit} × L${set.repsL} / R${set.repsR}`;
-    }
-    if (exercise.sideMode === 'totalCombined') {
-        return `${label}: ${set.weight} ${exercise.unit} × ${set.reps} reps (total)`;
-    }
-    return `${label}: ${set.weight} ${exercise.unit} × ${set.reps} reps`;
-}
-
-/* ===================================================================
-   7. INFO SCREEN LOGIC
+   6. INFO SCREEN LOGIC
    =================================================================== */
 
 /**
@@ -1274,7 +1237,7 @@ function initInfoScreen() {
 }
 
 /* ===================================================================
-   8. INITIALIZATION ON PAGE LOAD
+   7. INITIALIZATION ON PAGE LOAD
    =================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1290,8 +1253,6 @@ document.addEventListener('DOMContentLoaded', () => {
         initHomeScreen();
     } else if (document.getElementById('workout-screen')) {
         initWorkoutScreen();
-    } else if (document.getElementById('history-screen')) {
-        initHistoryScreen();
     } else if (document.getElementById('info-screen')) {
         initInfoScreen();
     }
