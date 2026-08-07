@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git branch *)",
+      "Bash(git remote *)",
+      "Bash(git fetch *)",
+      "Bash(git -C \"c:\\\\Users\\\\julia\\\\.vscode\\\\.src\\\\Gym_App\" remote -v)",
+      "Bash(git -C \"c:\\\\Users\\\\julia\\\\.vscode\\\\.src\\\\Gym_App\" rev-parse --show-toplevel)",
+      "Bash(node -c app.js)",
+      "Bash(gh auth *)",
+      "Bash(gh --version)",
+      "Bash(\".venv/Scripts/pip.exe\" --version)",
+      "Bash(timeout 30 \".venv/Scripts/pip.exe\" install --dry-run playwright)",
+      "Bash(\".venv/Scripts/pip.exe\" install *)",
+      "Bash(\".venv/Scripts/python.exe\" -m playwright install chromium --with-deps)",
+      "Bash(\".venv/Scripts/python.exe\" \"C:\\\\Users\\\\julia\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-julia--vscode--src-Gym-App\\\\f56768aa-3d32-484c-899c-6fc798d10869\\\\scratchpad\\\\test_app.py\")",
+      "Bash(PYTHONIOENCODING=utf-8 \".venv/Scripts/python.exe\" \"C:\\\\Users\\\\julia\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-julia--vscode--src-Gym-App\\\\f56768aa-3d32-484c-899c-6fc798d10869\\\\scratchpad\\\\test_app.py\")",
+      "Bash(PYTHONIOENCODING=utf-8 \".venv/Scripts/python.exe\" -)",
+      "PowerShell(Get-Command node -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command py -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command python -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command chromium-cli -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command chromium-cli.exe -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command chromium-cli.cmd -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command npx -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command gh -ErrorAction SilentlyContinue)",
+      "PowerShell(node --version 2>$null)",
+      "PowerShell(npx --version 2>$null)",
+      "PowerShell(gh auth status 2>&1)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "mcp__Claude_Browser__read_page",
+      "mcp__Claude_Browser__get_page_text"
+    ]
+  }
+}
