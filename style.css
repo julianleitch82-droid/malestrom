@@ -1011,43 +1011,31 @@ input:focus-visible {
     white-space: nowrap;
 }
 
-.rest-selector-options {
-    display: flex;
-    gap: var(--spacing-sm);
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.rest-opt-btn {
+/* Compact dropdown standing in for the old pill-button row — a row of
+   30s/60s/90s/2m/3m pills overflowed the viewport on mobile (the last pill
+   got clipped at the screen edge). A native <select> stays a fixed, narrow
+   width regardless of how many options it holds. */
+.rest-select {
     padding: var(--spacing-xs) var(--spacing-md);
     min-height: 36px;
     background-color: var(--bg-card);
-    color: var(--text-muted);
+    color: var(--text-light);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     font-size: var(--font-size-sm);
     font-family: inherit;
     font-weight: 600;
     cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.15s ease;
 }
 
-.rest-opt-btn.active {
-    background-color: var(--accent-primary);
-    color: #fff;
-    border-color: var(--accent-primary);
-}
-
-.rest-opt-btn:active {
+.rest-select:active {
     opacity: 0.7;
 }
 
 /* Per-set rest override, nested inside an active/editing set card —
-   reuses .rest-selector-label/.rest-selector-options/.rest-opt-btn, just a
-   different wrapper with tighter spacing and a divider from the fields above.
-   flex-basis: 100% forces it onto its own line within the flex-wrap parent
+   reuses .rest-selector-label/.rest-select, just a different wrapper with
+   tighter spacing and a divider from the fields above. flex-basis: 100%
+   forces it onto its own line within the flex-wrap parent
    (.active-set-inputs), below the weight/reps fields rather than squeezed
    beside them. */
 .set-rest-selector {

@@ -96,13 +96,13 @@
                      but each set can still override it individually below. -->
                 <div class="rest-selector">
                     <span class="rest-selector-label">Default Rest</span>
-                    <div class="rest-selector-options" id="detail-rest-default-options">
-                        <button class="rest-opt-btn" data-seconds="30">30s</button>
-                        <button class="rest-opt-btn" data-seconds="60">60s</button>
-                        <button class="rest-opt-btn" data-seconds="90">90s</button>
-                        <button class="rest-opt-btn" data-seconds="120">2m</button>
-                        <button class="rest-opt-btn" data-seconds="180">3m</button>
-                    </div>
+                    <select class="rest-select" id="detail-rest-default-select">
+                        <option value="30">30s</option>
+                        <option value="60">60s</option>
+                        <option value="90">90s</option>
+                        <option value="120">2m</option>
+                        <option value="180">3m</option>
+                    </select>
                 </div>
                 <div id="detail-sets-container" class="detail-sets-container"></div>
                 <div id="detail-trend-container" class="detail-trend-container"></div>

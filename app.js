@@ -751,7 +751,7 @@ function getLastWeightForExercise(dayId, exerciseId) {
 
 /**
  * Rest duration for a given exercise: a user-editable override (stored in
- * localStorage, set via the pill selector on the Exercise Detail View) if
+ * localStorage, set via the rest dropdown on the Exercise Detail View) if
  * one exists, otherwise the exercise's baseline default from PROGRAM,
  * otherwise 90s as a last resort. Kept separate from PROGRAM so the default
  * is editable without a code change/redeploy.
@@ -822,25 +822,19 @@ function closeExerciseDetail() {
 
 /**
  * The exercise-level default rest control. This markup is static in
- * workout.html (not rebuilt per exercise like the set rows are), so click
- * handlers are assigned via .onclick rather than addEventListener — that
- * replaces the previous handler instead of stacking a new one every time a
- * different exercise's detail view is opened.
+ * workout.html (not rebuilt per exercise like the set rows are), so the
+ * change handler is assigned via .onchange rather than addEventListener —
+ * that replaces the previous handler instead of stacking a new one every
+ * time a different exercise's detail view is opened.
  */
 function renderExerciseRestDefault(exercise) {
-    const container = document.getElementById('detail-rest-default-options');
-    if (!container) return;
+    const select = document.getElementById('detail-rest-default-select');
+    if (!select) return;
 
-    const current = getExerciseRestDefault(exercise);
-    container.querySelectorAll('.rest-opt-btn').forEach(btn => {
-        const seconds = parseInt(btn.dataset.seconds);
-        btn.classList.toggle('active', seconds === current);
-        btn.onclick = () => {
-            setExerciseRestDefault(exercise.id, seconds);
-            container.querySelectorAll('.rest-opt-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        };
-    });
+    select.value = getExerciseRestDefault(exercise);
+    select.onchange = () => {
+        setExerciseRestDefault(exercise.id, parseInt(select.value));
+    };
 }
 
 /**
@@ -995,7 +989,6 @@ function renderDetailSets(exercise, exerciseIndex) {
                 editingSetNum = null;
                 renderDetailSets(exercise, exerciseIndex);
             });
-            wireRestPills(setEl);
         } else if (data) {
             // Already-logged set — tap to correct it
             setEl.className = 'detail-set completed';
@@ -1023,7 +1016,6 @@ function renderDetailSets(exercise, exerciseIndex) {
             setEl.querySelector('.complete-set-btn').addEventListener('click', () => {
                 completeSet(exerciseIndex, setNum, exercise);
             });
-            wireRestPills(setEl);
         } else {
             setEl.className = 'detail-set pending';
             setEl.innerHTML = `
@@ -1050,10 +1042,10 @@ function renderDetailSets(exercise, exerciseIndex) {
     }
 }
 
-const REST_PILL_OPTIONS = [30, 60, 90, 120, 180];
+const REST_OPTIONS = [30, 60, 90, 120, 180];
 
 function formatRestLabel(seconds) {
-    // Matches the original static pill labels: 30s/60s/90s/2m/3m — only the
+    // Matches the original static option labels: 30s/60s/90s/2m/3m — only the
     // two round-minute values switch to "Xm", not every value >= 60.
     if (seconds === 120) return '2m';
     if (seconds === 180) return '3m';
@@ -1061,45 +1053,33 @@ function formatRestLabel(seconds) {
 }
 
 /**
- * Per-set rest-duration override pills — appended to every active/editing
+ * Per-set rest-duration override dropdown — appended to every active/editing
  * set's inputs (all exercise types get a rest period, including timed
  * holds). Pre-selects the set's existing restSeconds when editing a past
  * set, or the exercise's current default for a new set — per-set changes
  * here don't touch the exercise default itself.
  */
-function renderRestPillsHtml(setNum, selectedSeconds) {
+function renderRestSelectHtml(setNum, selectedSeconds) {
     return `
-        <div class="set-rest-selector" id="set-rest-${setNum}">
+        <div class="set-rest-selector">
             <span class="rest-selector-label">Rest</span>
-            <div class="rest-selector-options">
-                ${REST_PILL_OPTIONS.map(s => `
-                    <button type="button" class="rest-opt-btn${s === selectedSeconds ? ' active' : ''}" data-seconds="${s}">${formatRestLabel(s)}</button>
+            <select class="rest-select" id="set-rest-${setNum}">
+                ${REST_OPTIONS.map(s => `
+                    <option value="${s}"${s === selectedSeconds ? ' selected' : ''}>${formatRestLabel(s)}</option>
                 `).join('')}
-            </div>
+            </select>
         </div>
     `;
 }
 
 function readSetRestSeconds(setNum, exercise) {
-    const activeBtn = document.querySelector(`#set-rest-${setNum} .rest-opt-btn.active`);
-    return activeBtn ? parseInt(activeBtn.dataset.seconds) : getExerciseRestDefault(exercise);
-}
-
-/** Toggles active state within one set's rest-pill row — scoped to setEl so
- * it never touches any other set's (or the exercise-default's) pills. */
-function wireRestPills(setEl) {
-    const buttons = setEl.querySelectorAll('.set-rest-selector .rest-opt-btn');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            buttons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        });
-    });
+    const select = document.getElementById(`set-rest-${setNum}`);
+    return select ? parseInt(select.value) : getExerciseRestDefault(exercise);
 }
 
 function renderActiveSetInputs(exercise, setNum, existingData) {
     const restSeconds = existingData?.restSeconds ?? getExerciseRestDefault(exercise);
-    const restPills = renderRestPillsHtml(setNum, restSeconds);
+    const restSelectHtml = renderRestSelectHtml(setNum, restSeconds);
 
     if (exercise.sideMode === 'variants') {
         const seconds = existingData?.seconds;
@@ -1108,7 +1088,7 @@ function renderActiveSetInputs(exercise, setNum, existingData) {
                 <label>Hold (seconds)</label>
                 <input type="number" id="set-seconds-${setNum}" placeholder="${exercise.holdSeconds}" ${seconds != null ? `value="${seconds}"` : ''} inputmode="numeric">
             </div>
-            ${restPills}
+            ${restSelectHtml}
         `;
     }
 
@@ -1134,7 +1114,7 @@ function renderActiveSetInputs(exercise, setNum, existingData) {
                     <input type="number" id="set-reps-r-${setNum}" placeholder="${exercise.reps}" ${existingData ? `value="${existingData.repsR}"` : ''} inputmode="numeric">
                 </div>
             </div>
-            ${restPills}
+            ${restSelectHtml}
         `;
     }
 
@@ -1144,7 +1124,7 @@ function renderActiveSetInputs(exercise, setNum, existingData) {
             <label>Reps${exercise.sideMode === 'totalCombined' ? ' (total)' : ''}</label>
             <input type="number" id="set-reps-${setNum}" placeholder="${exercise.reps}" ${existingData ? `value="${existingData.reps}"` : ''} inputmode="numeric">
         </div>
-        ${restPills}
+        ${restSelectHtml}
     `;
 }
 
