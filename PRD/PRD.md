@@ -2,7 +2,7 @@
 ## Malestrom — Workout Tracker PWA
 
 **Version:** 2.0  
-**Last Updated:** July 2026  
+**Last Updated:** August 2026  
 **Status:** In Progress
 
 ---
@@ -129,17 +129,17 @@ A full-screen takeover opened by tapping any exercise in the list. This is the o
 - **Video demo:** 16:9 short looping MP4 (H.264) showing the correct movement. Each exercise points at its own filename in `videos/`; until the real clip is filmed, the `<video>` element's `onerror` handler falls back to the shared `videos/demo.mp4` placeholder automatically — no code change needed when a real clip is added later. The `<video>` element uses `autoplay loop muted playsinline` so it behaves like a GIF but at a fraction of the file size and much higher quality
 - **Warning banner:** shown in orange if the exercise has an injury or limitation flag
 - **Coaching note banner:** shown (in a distinct accent color from the warning) when the PT program specifies a tempo/eccentric technique note — always visible, not buried in a tooltip
-- **Default Rest selector:** a pill row (30s/60s/90s/2m/3m) near the top of the screen, setting this exercise's default rest duration. Editable any time the exercise is opened — no separate settings screen. Persisted per-exercise in `localStorage` (`exerciseRestDefaults`, see 8.2), overriding the exercise's baseline `defaultRestSeconds` from `PROGRAM` so it's changeable without a code deploy
+- **Default Rest selector:** a dropdown (30s/60s/90s/2m/3m) near the top of the screen, setting this exercise's default rest duration. Editable any time the exercise is opened — no separate settings screen. Persisted per-exercise in `localStorage` (`exerciseRestDefaults`, see 8.2), overriding the exercise's baseline `defaultRestSeconds` from `PROGRAM` so it's changeable without a code deploy
 - **Set rows** displayed in sequence, with the input shape depending on the exercise's notation:
   - Plain (no suffix): one weight input + one reps input
   - `E` (per side): one weight input + separate Left/Right reps inputs, logged independently
   - `T` (total combined): one weight input + one reps input, labeled "(total)"
   - Timed variants (e.g. Plank & Side Plank): no weight field, one seconds input per named variant hold
-  - Every set shape above also gets its own **Rest** pill row (same 30s/60s/90s/2m/3m options), pre-selected to the exercise's current default — see 5.2b. Changing it only affects that one set; it doesn't touch the exercise default
-  - Completed sets: shown in green with the logged result formatted per the above. **Tappable** — opens the same inputs pre-filled with the logged values (rather than placeholders), including the rest pill pre-selected to whatever was actually used for that set, plus Save/Cancel buttons, so a mis-logged set can be corrected without redoing the whole exercise. Only one set can be edited at a time; editing doesn't restart the rest timer or disturb which set is "active" next. Since `sessionData` isn't written to `localStorage` until "Complete Workout" is tapped (see 8.2), a correction here never needs to touch history separately — the fixed value just flows through whatever gets saved at the end
+  - Every set shape above also gets its own **Rest** dropdown (same 30s/60s/90s/2m/3m options), pre-selected to the exercise's current default — see 5.2b. Changing it only affects that one set; it doesn't touch the exercise default
+  - Completed sets: shown in green with the logged result formatted per the above. **Tappable** — opens the same inputs pre-filled with the logged values (rather than placeholders), including the rest dropdown pre-selected to whatever was actually used for that set, plus Save/Cancel buttons, so a mis-logged set can be corrected without redoing the whole exercise. Only one set can be edited at a time; editing doesn't restart the rest timer or disturb which set is "active" next. Since `sessionData` isn't written to `localStorage` until "Complete Workout" is tapped (see 8.2), a correction here never needs to touch history separately — the fixed value just flows through whatever gets saved at the end
   - Active set (next uncompleted): the appropriate inputs + "Complete Set" button
   - Pending sets: dimmed, no interaction until prior set is completed
-- **Default values:** if the user leaves weight or reps blank and taps "Complete Set" (or Save, when editing), the app uses the placeholder value shown in the input — either the last session's logged weight for that exercise, or the starting weight from the program. The rest pill always has an explicit selection (no blank state)
+- **Default values:** if the user leaves weight or reps blank and taps "Complete Set" (or Save, when editing), the app uses the placeholder value shown in the input — either the last session's logged weight for that exercise, or the starting weight from the program. The rest dropdown always has an explicit selection (no blank state)
 - **Rest timer bar** (see 5.2b): always visible at the bottom of this screen
 - When all sets are done, an "All sets complete!" confirmation is shown with a back button
 
@@ -147,7 +147,7 @@ A full-screen takeover opened by tapping any exercise in the list. This is the o
 
 A persistent bar docked to the bottom of the Exercise Detail View — it never scrolls away and is always visible to the user.
 
-- Rest duration is a property of the **set being completed**, not a single global/session-wide setting — each set carries whatever value its own Rest pill was showing when "Complete Set" was tapped (inherited from the exercise default unless overridden for that set)
+- Rest duration is a property of the **set being completed**, not a single global/session-wide setting — each set carries whatever value its own Rest dropdown was showing when "Complete Set" was tapped (inherited from the exercise default unless overridden for that set)
 - Starts automatically after the user taps "Complete Set", using that set's chosen duration, provided there are more sets remaining
 - Shows a large countdown and a depleting pink fill behind it (matches `--accent-primary`, updated from the original blue when the app was re-themed)
 - Turns green and pulses (with haptic vibration on supported devices — vibration is a no-op on iOS Safari, which has never implemented the Vibration API; the chime still sounds) when time is up
@@ -231,10 +231,13 @@ an app rewrite. An in-app UI for switching between multiple *saved* programs is 
   against any future layout squeeze clipping the display value
 - **Minimal navigation:** get in, log the workout, get out
 - **Colours:** simple, clean — no unnecessary decoration
-- **Reuse over new components:** the pill-selector pattern (`.rest-selector`/`.rest-opt-btn`)
-  introduced for the original global rest picker was kept and reused as-is for both the
-  per-exercise default and the per-set override, rather than inventing a new control — same look,
-  same interaction, just re-scoped to smaller pieces of the UI
+- **Reuse over new components:** one rest-duration control shape is shared by both the
+  per-exercise default and the per-set override, rather than inventing a separate control for
+  each — same markup helper, same options, just re-scoped to smaller pieces of the UI. The
+  control itself was originally a horizontally-scrolling pill row (`.rest-opt-btn`), but that
+  relied on scroll to fit all 5 options and clipped the last pill ("3m") at the screen edge on
+  some phones; it was replaced with a native `<select>` (`.rest-select`, see 5.2a/5.2b) that
+  stays a fixed, compact width regardless of option count
 
 ---
 
@@ -358,4 +361,5 @@ later without rewriting history.
 | 20 | Completed sets are now editable — tap a logged set to correct weight/reps (pre-filled, not placeholders) instead of it being display-only; input element IDs scoped per set number so the edited row and the still-active next row never collide; edit doesn't touch localStorage directly or restart the rest timer, since sessionData is the single source of truth until "Complete Workout" persists it all at once | Complete |
 | 21 | Home screen day-card heading now shows the workout name (e.g. "Chest / Shoulders / Triceps") instead of "Day A" — the old muscle-group subtitle line was dropped since the heading replaced it; the "A"/"B"/"C" day id is untouched everywhere it's used functionally (`data-day` attributes, localStorage `dayId`), only removed from this one piece of visible text | Complete |
 | 22 | Removed the standalone History screen (`history.html` deleted, nav/button references cleaned up) and replaced it with a per-exercise Weight Trend Chart at the bottom of the Exercise Detail View — one point per session (heaviest set that day), rolling 6-month window, raw data only (see 5.3). Hand-rolled inline SVG rather than Chart.js, to stay offline-safe. Service worker cache bumped to v3 | Complete |
-| 23 | Stopwatch + per-set rest timer — added a manual count-up stopwatch (5.1b) in the old global rest-selector's slot; removed the global rest-duration picker entirely and replaced it with a per-exercise default (5.2a) plus a per-set override (5.2a/5.2b), so different exercises/sets can rest for different lengths of time instead of one setting for the whole session. `PROGRAM` exercises gained `defaultRestSeconds`; sessions gained per-set `restSeconds`; `localStorage` gained an `exerciseRestDefaults` override map (see 8.1/8.2). Input element IDs for the rest pills follow the same per-set-number scoping as the weight/reps fields, avoiding collisions between an edited row and the still-active next row. Service worker cache bumped to v4 | Complete |
+| 23 | Stopwatch + per-set rest timer — added a manual count-up stopwatch (5.1b) in the old global rest-selector's slot; removed the global rest-duration picker entirely and replaced it with a per-exercise default (5.2a) plus a per-set override (5.2a/5.2b), so different exercises/sets can rest for different lengths of time instead of one setting for the whole session. `PROGRAM` exercises gained `defaultRestSeconds`; sessions gained per-set `restSeconds`; `localStorage` gained an `exerciseRestDefaults` override map (see 8.1/8.2). Input element IDs for the rest dropdowns follow the same per-set-number scoping as the weight/reps fields, avoiding collisions between an edited row and the still-active next row. Service worker cache bumped to v4 | Complete |
+| 24 | Rest-duration controls (5.2a/5.2b) changed from a horizontally-scrolling pill row to a native `<select>` dropdown, for both the per-exercise default and the per-set override — gym testing found the pill row overflowed on mobile, clipping the "3m" option at the screen edge. Selected-value behaviour, per-set-number ID scoping, and localStorage/`restSeconds` wiring are unchanged, only the control markup/CSS. **Service worker cache was not bumped for this change** (stayed at v4) even though `app.js`/`style.css`/`workout.html` all changed — until it is, users may see the old pill layout until they use the Info screen's "Force Refresh App" button (5.5) or the cache naturally rolls over on a future bump | Complete (code) — cache-bump follow-up outstanding |
