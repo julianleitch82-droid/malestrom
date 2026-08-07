@@ -39,7 +39,7 @@ const PROGRAM = {
             exercises: [
                 {
                     id: 'db-incline-chest-press', name: 'DB Incline Chest Press',
-                    sets: 4, reps: 6, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 4, reps: 6, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: 'Eccentric',
                     note: 'Slow descent — slowly lower the dumbbells toward your upper chest (sternum/clavicle area) for a controlled count of 3 to 5 seconds before driving back to the start position.',
                     warning: null,
@@ -47,13 +47,13 @@ const PROGRAM = {
                 },
                 {
                     id: 'db-standing-lateral-raise', name: 'DB Standing Lateral Raise',
-                    sets: 3, reps: 8, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 3, reps: 8, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: null, warning: null,
                     video: 'videos/db-standing-lateral-raise.mp4', sourceVideoUrl: 'https://youtube.com/shorts/U2gMn8GXr2A?si=Z3EZjgYy46eNnBCm'
                 },
                 {
                     id: 'db-chest-flys', name: 'DB Chest Flys',
-                    sets: 4, reps: 8, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 4, reps: 8, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: 'Tempo 3/1/3',
                     note: '3s down in a wide arc with a slight elbow bend (~10-15°) — actively stretches the pecs. 1s pause at chest level (no bouncing). 3s up, squeezing the pecs in a wide hugging motion back to the start, stopping just short of the dumbbells touching at the top to keep constant tension.',
                     warning: null,
@@ -61,19 +61,19 @@ const PROGRAM = {
                 },
                 {
                     id: 'cable-tricep-pushdown', name: 'Cable Tricep Pushdowns',
-                    sets: 3, reps: 15, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 3, reps: 15, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: null, warning: null,
                     video: 'videos/cable-tricep-pushdown.mp4', sourceVideoUrl: 'https://youtube.com/shorts/1FjkhpZsaxc?si=L30mWGwYwb6EOG-q'
                 },
                 {
                     id: 'db-bench-pullover', name: 'DB Bench Pullovers',
-                    sets: 4, reps: 12, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 4, reps: 12, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: null, warning: null,
                     video: 'videos/db-bench-pullover.mp4', sourceVideoUrl: 'https://youtube.com/shorts/Datv2L6t3-4?si=I3S5r_z70LDwC4fM'
                 },
                 {
                     id: 'db-tricep-overhead-extension', name: 'DB Tricep Overhead Extension',
-                    sets: 3, reps: 10, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 3, reps: 10, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: null, warning: null,
                     video: 'videos/db-tricep-overhead-extension.mp4', sourceVideoUrl: 'https://youtube.com/shorts/b_r_LW4HEcM?si=4acgoI4fLlq1WLU6'
                 }
@@ -95,7 +95,7 @@ const PROGRAM = {
             exercises: [
                 {
                     id: 'lat-pulldown', name: 'Lat Pull-Down',
-                    sets: 4, reps: 6, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 4, reps: 6, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: 'Tempo 3/1/3',
                     note: 'From the top position with arms extended, pull the bar down to your upper chest taking 3s. Pause at the chest for 1s. Then slowly control the bar back up to the starting position taking exactly 3s.',
                     warning: null,
@@ -103,13 +103,13 @@ const PROGRAM = {
                 },
                 {
                     id: 'cable-bicep-curl', name: 'Cable Bicep Curls',
-                    sets: 3, reps: 10, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 3, reps: 10, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: null, warning: null,
                     video: 'videos/cable-bicep-curl.mp4', sourceVideoUrl: 'https://youtube.com/shorts/CrbTqNOlFgE?si=bDmA2DDgOs-tsk_1'
                 },
                 {
                     id: 'db-one-arm-row', name: 'DB One-Arm Row',
-                    sets: 3, reps: 8, type: 'reps', sideMode: 'perSide', unit: 'kg', startWeight: null,
+                    sets: 3, reps: 8, type: 'reps', sideMode: 'perSide', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null,
                     note: '2 second pause at the top of each rep.',
                     warning: null,
@@ -117,13 +117,13 @@ const PROGRAM = {
                 },
                 {
                     id: 'db-seated-hammer-curl', name: 'DB Seated Alt. Hammer Curl',
-                    sets: 4, reps: 12, type: 'reps', sideMode: 'totalCombined', unit: 'kg', startWeight: null,
+                    sets: 4, reps: 12, type: 'reps', sideMode: 'totalCombined', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: null, warning: null,
                     video: 'videos/db-seated-hammer-curl.mp4', sourceVideoUrl: 'https://youtube.com/shorts/cR2yNeMt1Xo?si=e03gOdSC7zCol0CI'
                 },
                 {
                     id: 'seated-row', name: 'Seated Row',
-                    sets: 3, reps: 8, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 3, reps: 8, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: 'Eccentric',
                     note: 'Instead of letting the weight snap your arms forward, slowly extend your arms back to the starting position. Take 3 to 5 seconds to control the stack, allowing a deep stretch in your lats at the end of the movement.',
                     warning: null,
@@ -131,7 +131,7 @@ const PROGRAM = {
                 },
                 {
                     id: 'bb-bicep-21s', name: "BB Bicep 21's",
-                    sets: 3, reps: 21, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 3, reps: 21, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null,
                     note: "21's — 7 reps bottom half of the range, 7 reps top half of the range, then 7 full reps = 21 per set.",
                     warning: null,
@@ -156,7 +156,7 @@ const PROGRAM = {
             exercises: [
                 {
                     id: 'bb-back-squat', name: 'BB Back Squat',
-                    sets: 4, reps: 6, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 4, reps: 6, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: 'Tempo 3/1/3',
                     note: '3s controlled descent — core tight, chest up, knees tracking properly. 1s pause in the hole, no bouncing. 3s smooth ascent, driving evenly through mid-foot and hips until standing tall.',
                     warning: null,
@@ -164,19 +164,19 @@ const PROGRAM = {
                 },
                 {
                     id: 'db-walking-lunge', name: 'DB Walking Lunge',
-                    sets: 3, reps: 12, type: 'reps', sideMode: 'totalCombined', unit: 'kg', startWeight: null,
+                    sets: 3, reps: 12, type: 'reps', sideMode: 'totalCombined', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: null, warning: null,
                     video: 'videos/db-walking-lunge.mp4', sourceVideoUrl: 'https://youtube.com/shorts/mWnmd5ZVcFw?si=jZOIjaptgA0nzBoA'
                 },
                 {
                     id: 'bb-deadlift', name: 'BB Deadlift',
-                    sets: 4, reps: 6, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 4, reps: 6, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: null, warning: null,
                     video: 'videos/bb-deadlift.mp4', sourceVideoUrl: 'https://youtube.com/shorts/xNwpvDuZJ3k?si=NttTJEc74-XW6Ojr'
                 },
                 {
                     id: 'seated-leg-curl', name: 'Seated Leg Curl',
-                    sets: 3, reps: 10, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null,
+                    sets: 3, reps: 10, type: 'reps', sideMode: 'none', unit: 'kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: 'Eccentric',
                     note: 'Release the weight slowly and deliberately back to the starting position. This phase should take 3 to 5 seconds to maximize muscle tension.',
                     warning: null,
@@ -186,14 +186,14 @@ const PROGRAM = {
                     id: 'plank-side-plank', name: 'Plank & Side Plank',
                     sets: 3, reps: null, type: 'time', sideMode: 'variants',
                     variantLabels: ['Plank', 'Side Plank (Left)', 'Side Plank (Right)'],
-                    holdSeconds: 30, unit: 'sec', startWeight: null,
+                    holdSeconds: 30, unit: 'sec', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: null, warning: null,
                     video: 'videos/plank-side-plank.mp4',
                     sourceVideoUrl: ['https://youtube.com/shorts/xe2MXatLTUw?si=Wvk0w27B4WV-Ik6U', 'https://youtube.com/shorts/BtM0a9x1F5o?si=i_MuYmZjv3M5xMGW']
                 },
                 {
                     id: 'russian-twist', name: 'Russian Twist',
-                    sets: 3, reps: 20, type: 'reps', sideMode: 'totalCombined', unit: 'bodyweight/kg', startWeight: null,
+                    sets: 3, reps: 20, type: 'reps', sideMode: 'totalCombined', unit: 'bodyweight/kg', startWeight: null, defaultRestSeconds: 90,
                     tempo: null, note: 'Bodyweight or weighted.', warning: null,
                     video: 'videos/russian-twist.mp4', sourceVideoUrl: 'https://youtube.com/shorts/aRUMRbl7KS4?si=NfSz87X7hbjRpgY_'
                 }
@@ -223,9 +223,13 @@ const StorageManager = {
             const initialData = {
                 sessions: [],
                 settings: {
-                    restPeriod: 90, // Default 90 seconds
                     theme: 'dark'
-                }
+                },
+                // Per-exercise rest-duration overrides, keyed by exercise id.
+                // Falls back to the exercise's defaultRestSeconds in PROGRAM,
+                // then to 90s, if an exercise has no override set. See
+                // getExerciseRestDefault/setExerciseRestDefault.
+                exerciseRestDefaults: {}
             };
             localStorage.setItem('workoutTrackerData', JSON.stringify(initialData));
             console.log('✓ Initialized localStorage structure');
@@ -297,7 +301,7 @@ const StorageManager = {
 
     /**
      * Update a setting
-     * @param {String} key - Setting key (e.g., 'restPeriod')
+     * @param {String} key - Setting key (e.g., 'theme')
      * @param {Any} value - New value
      */
     updateSetting: function(key, value) {
@@ -470,16 +474,7 @@ function initWorkoutScreen() {
     document.getElementById('detail-back-btn')?.addEventListener('click', closeExerciseDetail);
     document.getElementById('skip-rest-btn')?.addEventListener('click', stopRestTimer);
 
-    // Rest duration selector — mark saved setting as active
-    const savedPeriod = StorageManager.getSettings()?.restPeriod || 90;
-    document.querySelectorAll('.rest-opt-btn').forEach(btn => {
-        if (parseInt(btn.dataset.seconds) === savedPeriod) btn.classList.add('active');
-        btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.rest-opt-btn').forEach(b => b.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            StorageManager.updateSetting('restPeriod', parseInt(e.currentTarget.dataset.seconds));
-        });
-    });
+    initStopwatch();
 
     // When phone unlocks / app returns to foreground, recalculate timer from stored end time
     document.addEventListener('visibilitychange', () => {
@@ -494,6 +489,77 @@ function initWorkoutScreen() {
             restTimerInterval = null;
         }
     });
+}
+
+// Quick-access stopwatch — entirely independent of the rest timer (separate
+// state, no shared variables) so starting/pausing/resetting it, or the rest
+// timer firing, never touches the other. Elapsed time is tracked via
+// accumulated ms + a "started at" timestamp rather than counting ticks, so
+// it stays accurate across background/foreground transitions, same approach
+// as the rest timer.
+let stopwatchElapsedMs = 0;
+let stopwatchStartedAt = null; // Date.now() while running; null when paused/reset
+let stopwatchInterval = null;
+
+function initStopwatch() {
+    const startBtn = document.getElementById('stopwatch-start-btn');
+    const pauseBtn = document.getElementById('stopwatch-pause-btn');
+    const resetBtn = document.getElementById('stopwatch-reset-btn');
+    const widget = document.getElementById('stopwatch-widget');
+    if (!startBtn || !pauseBtn || !resetBtn) return;
+
+    startBtn.addEventListener('click', () => {
+        if (stopwatchStartedAt) return; // already running
+        stopwatchStartedAt = Date.now();
+        startBtn.classList.add('hidden');
+        pauseBtn.classList.remove('hidden');
+        widget?.classList.add('active');
+        if (stopwatchInterval) clearInterval(stopwatchInterval);
+        stopwatchInterval = setInterval(updateStopwatchDisplay, 250);
+        updateStopwatchDisplay();
+    });
+
+    pauseBtn.addEventListener('click', () => {
+        if (!stopwatchStartedAt) return;
+        stopwatchElapsedMs += Date.now() - stopwatchStartedAt;
+        stopwatchStartedAt = null;
+        if (stopwatchInterval) { clearInterval(stopwatchInterval); stopwatchInterval = null; }
+        startBtn.classList.remove('hidden');
+        pauseBtn.classList.add('hidden');
+        updateStopwatchDisplay();
+    });
+
+    resetBtn.addEventListener('click', () => {
+        stopwatchElapsedMs = 0;
+        stopwatchStartedAt = null;
+        if (stopwatchInterval) { clearInterval(stopwatchInterval); stopwatchInterval = null; }
+        startBtn.classList.remove('hidden');
+        pauseBtn.classList.add('hidden');
+        widget?.classList.remove('active');
+        updateStopwatchDisplay();
+    });
+
+    // Recalculate on foreground return, matching the rest timer's approach —
+    // avoids a stale display or a dead interval after the app is backgrounded.
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && stopwatchStartedAt) {
+            updateStopwatchDisplay();
+            if (!stopwatchInterval) stopwatchInterval = setInterval(updateStopwatchDisplay, 250);
+        }
+        if (document.hidden && stopwatchInterval) {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+        }
+    });
+}
+
+function updateStopwatchDisplay() {
+    const totalMs = stopwatchElapsedMs + (stopwatchStartedAt ? Date.now() - stopwatchStartedAt : 0);
+    const totalSeconds = Math.floor(totalMs / 1000);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    const display = document.getElementById('stopwatch-display');
+    if (display) display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
 // In-session warm-up progress: which round we're on and which items are
@@ -683,6 +749,26 @@ function getLastWeightForExercise(dayId, exerciseId) {
     return sets[sets.length - 1].weight ?? null;
 }
 
+/**
+ * Rest duration for a given exercise: a user-editable override (stored in
+ * localStorage, set via the pill selector on the Exercise Detail View) if
+ * one exists, otherwise the exercise's baseline default from PROGRAM,
+ * otherwise 90s as a last resort. Kept separate from PROGRAM so the default
+ * is editable without a code change/redeploy.
+ */
+function getExerciseRestDefault(exercise) {
+    const overrides = StorageManager.getData()?.exerciseRestDefaults || {};
+    if (overrides[exercise.id] != null) return overrides[exercise.id];
+    return exercise.defaultRestSeconds ?? 90;
+}
+
+function setExerciseRestDefault(exerciseId, seconds) {
+    const data = StorageManager.getData();
+    if (!data.exerciseRestDefaults) data.exerciseRestDefaults = {};
+    data.exerciseRestDefaults[exerciseId] = seconds;
+    StorageManager.saveData(data);
+}
+
 function openExerciseDetail(exerciseIndex) {
     const exercise = getDay(currentDay).exercises[exerciseIndex];
     currentExerciseIndex = exerciseIndex;
@@ -708,6 +794,7 @@ function openExerciseDetail(exerciseIndex) {
         }
     }
 
+    renderExerciseRestDefault(exercise);
     renderDetailSets(exercise, exerciseIndex);
     renderExerciseTrend(exercise);
     document.getElementById('exercise-detail').classList.remove('hidden');
@@ -731,6 +818,29 @@ function closeExerciseDetail() {
     currentExerciseIndex = null;
     editingSetNum = null;
     if (currentDay) renderExerciseList(getDay(currentDay).exercises);
+}
+
+/**
+ * The exercise-level default rest control. This markup is static in
+ * workout.html (not rebuilt per exercise like the set rows are), so click
+ * handlers are assigned via .onclick rather than addEventListener — that
+ * replaces the previous handler instead of stacking a new one every time a
+ * different exercise's detail view is opened.
+ */
+function renderExerciseRestDefault(exercise) {
+    const container = document.getElementById('detail-rest-default-options');
+    if (!container) return;
+
+    const current = getExerciseRestDefault(exercise);
+    container.querySelectorAll('.rest-opt-btn').forEach(btn => {
+        const seconds = parseInt(btn.dataset.seconds);
+        btn.classList.toggle('active', seconds === current);
+        btn.onclick = () => {
+            setExerciseRestDefault(exercise.id, seconds);
+            container.querySelectorAll('.rest-opt-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
+    });
 }
 
 /**
@@ -885,6 +995,7 @@ function renderDetailSets(exercise, exerciseIndex) {
                 editingSetNum = null;
                 renderDetailSets(exercise, exerciseIndex);
             });
+            wireRestPills(setEl);
         } else if (data) {
             // Already-logged set — tap to correct it
             setEl.className = 'detail-set completed';
@@ -912,6 +1023,7 @@ function renderDetailSets(exercise, exerciseIndex) {
             setEl.querySelector('.complete-set-btn').addEventListener('click', () => {
                 completeSet(exerciseIndex, setNum, exercise);
             });
+            wireRestPills(setEl);
         } else {
             setEl.className = 'detail-set pending';
             setEl.innerHTML = `
@@ -938,7 +1050,57 @@ function renderDetailSets(exercise, exerciseIndex) {
     }
 }
 
+const REST_PILL_OPTIONS = [30, 60, 90, 120, 180];
+
+function formatRestLabel(seconds) {
+    // Matches the original static pill labels: 30s/60s/90s/2m/3m — only the
+    // two round-minute values switch to "Xm", not every value >= 60.
+    if (seconds === 120) return '2m';
+    if (seconds === 180) return '3m';
+    return `${seconds}s`;
+}
+
+/**
+ * Per-set rest-duration override pills — appended to every active/editing
+ * set's inputs (all exercise types get a rest period, including timed
+ * holds). Pre-selects the set's existing restSeconds when editing a past
+ * set, or the exercise's current default for a new set — per-set changes
+ * here don't touch the exercise default itself.
+ */
+function renderRestPillsHtml(setNum, selectedSeconds) {
+    return `
+        <div class="set-rest-selector" id="set-rest-${setNum}">
+            <span class="rest-selector-label">Rest</span>
+            <div class="rest-selector-options">
+                ${REST_PILL_OPTIONS.map(s => `
+                    <button type="button" class="rest-opt-btn${s === selectedSeconds ? ' active' : ''}" data-seconds="${s}">${formatRestLabel(s)}</button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function readSetRestSeconds(setNum, exercise) {
+    const activeBtn = document.querySelector(`#set-rest-${setNum} .rest-opt-btn.active`);
+    return activeBtn ? parseInt(activeBtn.dataset.seconds) : getExerciseRestDefault(exercise);
+}
+
+/** Toggles active state within one set's rest-pill row — scoped to setEl so
+ * it never touches any other set's (or the exercise-default's) pills. */
+function wireRestPills(setEl) {
+    const buttons = setEl.querySelectorAll('.set-rest-selector .rest-opt-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+}
+
 function renderActiveSetInputs(exercise, setNum, existingData) {
+    const restSeconds = existingData?.restSeconds ?? getExerciseRestDefault(exercise);
+    const restPills = renderRestPillsHtml(setNum, restSeconds);
+
     if (exercise.sideMode === 'variants') {
         const seconds = existingData?.seconds;
         return `
@@ -946,6 +1108,7 @@ function renderActiveSetInputs(exercise, setNum, existingData) {
                 <label>Hold (seconds)</label>
                 <input type="number" id="set-seconds-${setNum}" placeholder="${exercise.holdSeconds}" ${seconds != null ? `value="${seconds}"` : ''} inputmode="numeric">
             </div>
+            ${restPills}
         `;
     }
 
@@ -971,6 +1134,7 @@ function renderActiveSetInputs(exercise, setNum, existingData) {
                     <input type="number" id="set-reps-r-${setNum}" placeholder="${exercise.reps}" ${existingData ? `value="${existingData.repsR}"` : ''} inputmode="numeric">
                 </div>
             </div>
+            ${restPills}
         `;
     }
 
@@ -980,6 +1144,7 @@ function renderActiveSetInputs(exercise, setNum, existingData) {
             <label>Reps${exercise.sideMode === 'totalCombined' ? ' (total)' : ''}</label>
             <input type="number" id="set-reps-${setNum}" placeholder="${exercise.reps}" ${existingData ? `value="${existingData.reps}"` : ''} inputmode="numeric">
         </div>
+        ${restPills}
     `;
 }
 
@@ -1002,12 +1167,14 @@ function formatSetResult(exercise, data) {
  * happens after the entry is captured).
  */
 function readSetInputs(exercise, setNum) {
+    const restSeconds = readSetRestSeconds(setNum, exercise);
+
     if (exercise.sideMode === 'variants') {
         const secondsInput = document.getElementById(`set-seconds-${setNum}`);
         const seconds = secondsInput.value !== ''
             ? parseInt(secondsInput.value)
             : parseInt(secondsInput.placeholder) || exercise.holdSeconds;
-        return { seconds };
+        return { seconds, restSeconds };
     }
 
     const weightInput = document.getElementById(`set-weight-${setNum}`);
@@ -1020,12 +1187,12 @@ function readSetInputs(exercise, setNum) {
         const repsRInput = document.getElementById(`set-reps-r-${setNum}`);
         const repsL = repsLInput.value !== '' ? parseInt(repsLInput.value) : parseInt(repsLInput.placeholder) || exercise.reps;
         const repsR = repsRInput.value !== '' ? parseInt(repsRInput.value) : parseInt(repsRInput.placeholder) || exercise.reps;
-        return { weight, repsL, repsR };
+        return { weight, repsL, repsR, restSeconds };
     }
 
     const repsInput = document.getElementById(`set-reps-${setNum}`);
     const reps = repsInput.value !== '' ? parseInt(repsInput.value) : parseInt(repsInput.placeholder) || exercise.reps;
-    return { weight, reps };
+    return { weight, reps, restSeconds };
 }
 
 function completeSet(exerciseIndex, setNum, exercise) {
@@ -1037,7 +1204,7 @@ function completeSet(exerciseIndex, setNum, exercise) {
     renderDetailSets(exercise, exerciseIndex);
 
     if (getCompletedSetCount(exerciseIndex) < exercise.sets) {
-        startRestTimer();
+        startRestTimer(entry.restSeconds);
     }
 }
 
@@ -1082,9 +1249,8 @@ function playTimerChime() {
     } catch (e) { /* audio not available */ }
 }
 
-function startRestTimer() {
-    const settings = StorageManager.getSettings();
-    const duration = (settings && settings.restPeriod) ? settings.restPeriod : 90;
+function startRestTimer(seconds) {
+    const duration = seconds || 90;
     restTotalDuration = duration;
     timerEndTime = Date.now() + duration * 1000;
 

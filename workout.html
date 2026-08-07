@@ -44,15 +44,16 @@
                 </div>
                 <p id="progress-text" class="progress-text"></p>
 
-                <!-- Rest duration selector -->
-                <div class="rest-selector">
-                    <span class="rest-selector-label">Rest</span>
-                    <div class="rest-selector-options">
-                        <button class="rest-opt-btn" data-seconds="30">30s</button>
-                        <button class="rest-opt-btn" data-seconds="60">60s</button>
-                        <button class="rest-opt-btn" data-seconds="90">90s</button>
-                        <button class="rest-opt-btn" data-seconds="120">2m</button>
-                        <button class="rest-opt-btn" data-seconds="180">3m</button>
+                <!-- Quick-access stopwatch — for timing warm-up drills etc, independent
+                     of the per-set rest timer. Sticks to the top of the scroll area once
+                     started/paused so it stays visible while scrolling the exercise list. -->
+                <div id="stopwatch-widget" class="stopwatch-widget">
+                    <span class="stopwatch-label">⏱️ Stopwatch</span>
+                    <span id="stopwatch-display" class="stopwatch-display">00:00</span>
+                    <div class="stopwatch-controls">
+                        <button id="stopwatch-start-btn" class="btn btn-secondary stopwatch-btn">Start</button>
+                        <button id="stopwatch-pause-btn" class="btn btn-secondary stopwatch-btn hidden">Pause</button>
+                        <button id="stopwatch-reset-btn" class="btn btn-secondary stopwatch-btn">Reset</button>
                     </div>
                 </div>
 
@@ -91,6 +92,18 @@
                 </div>
                 <div id="detail-warning" class="exercise-warning detail-warning-hidden"></div>
                 <div id="detail-note" class="exercise-note detail-note-hidden"></div>
+                <!-- Default rest duration for this exercise — new sets inherit this,
+                     but each set can still override it individually below. -->
+                <div class="rest-selector">
+                    <span class="rest-selector-label">Default Rest</span>
+                    <div class="rest-selector-options" id="detail-rest-default-options">
+                        <button class="rest-opt-btn" data-seconds="30">30s</button>
+                        <button class="rest-opt-btn" data-seconds="60">60s</button>
+                        <button class="rest-opt-btn" data-seconds="90">90s</button>
+                        <button class="rest-opt-btn" data-seconds="120">2m</button>
+                        <button class="rest-opt-btn" data-seconds="180">3m</button>
+                    </div>
+                </div>
                 <div id="detail-sets-container" class="detail-sets-container"></div>
                 <div id="detail-trend-container" class="detail-trend-container"></div>
             </div>

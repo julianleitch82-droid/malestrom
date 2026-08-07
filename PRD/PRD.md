@@ -19,7 +19,8 @@ A long-term personal training companion for tracking a structured 3-day full bod
 
 - Make it easy to follow the program in the gym without paper or scrolling through notes
 - Log weights, sets and reps as they happen
-- Have a rest timer that starts only after the user marks a set complete. The timer should show a small alert when it finishes. Completion can be marked by a button, checkbox, or similar control.
+- Have a rest timer that starts only after the user marks a set complete. The timer should show a small alert when it finishes. Completion can be marked by a button, checkbox, or similar control. Rest duration belongs to the set/exercise, not one global session-wide setting.
+- Provide a simple manual stopwatch for timing things that aren't set-and-rest (e.g. the warm-up cardio block), fully independent of the rest timer.
 - Show previous session data so the user knows what they lifted last time.
 - Let the user see how their weight for an exercise has moved over recent months, shown directly on that exercise's own logging screen — as raw data, not an interpreted "progress" or "regression" narrative.
 - Allow users to flag exercises that require care due to injuries or limitations.
@@ -100,6 +101,13 @@ Drop ×6, Air Squat ×8, Inch Worm ×5.
 - This is visual only and is **not** persisted to history in v1 (no weight/rep logging for warm-ups); round progress resets on page navigation like the rest of in-session state
 - Each item shows its video thumbnail and rep scheme (including "each side" where relevant)
 
+### 5.1b Stopwatch (per workout)
+- A manual count-up stopwatch sits at the top of the Active Workout Screen, in the slot that used to hold the (now-removed) global rest-duration selector — for timing things that aren't a logged set, e.g. the warm-up cardio block
+- Manual Start / Pause / Reset only — never auto-starts, never auto-resets
+- Fully independent of the rest timer: separate state, separate DOM, separate functions. Starting/pausing/resetting it, or the rest timer firing, never touches the other
+- Elapsed time (mm:ss) is tracked via an accumulated-ms counter plus a "started at" timestamp (not by counting ticks), so it stays accurate across the app being backgrounded and foregrounded again, the same approach the rest timer already used
+- Sticks to the top of the screen (directly beneath the header) while running or paused, so it stays visible while scrolling through the exercise list — un-sticks only on Reset, back to the pristine 00:00 state
+
 ### 5.2 Active Workout Screen — Exercise List
 
 - Lists exercises for the selected day in order
@@ -121,15 +129,17 @@ A full-screen takeover opened by tapping any exercise in the list. This is the o
 - **Video demo:** 16:9 short looping MP4 (H.264) showing the correct movement. Each exercise points at its own filename in `videos/`; until the real clip is filmed, the `<video>` element's `onerror` handler falls back to the shared `videos/demo.mp4` placeholder automatically — no code change needed when a real clip is added later. The `<video>` element uses `autoplay loop muted playsinline` so it behaves like a GIF but at a fraction of the file size and much higher quality
 - **Warning banner:** shown in orange if the exercise has an injury or limitation flag
 - **Coaching note banner:** shown (in a distinct accent color from the warning) when the PT program specifies a tempo/eccentric technique note — always visible, not buried in a tooltip
+- **Default Rest selector:** a pill row (30s/60s/90s/2m/3m) near the top of the screen, setting this exercise's default rest duration. Editable any time the exercise is opened — no separate settings screen. Persisted per-exercise in `localStorage` (`exerciseRestDefaults`, see 8.2), overriding the exercise's baseline `defaultRestSeconds` from `PROGRAM` so it's changeable without a code deploy
 - **Set rows** displayed in sequence, with the input shape depending on the exercise's notation:
   - Plain (no suffix): one weight input + one reps input
   - `E` (per side): one weight input + separate Left/Right reps inputs, logged independently
   - `T` (total combined): one weight input + one reps input, labeled "(total)"
   - Timed variants (e.g. Plank & Side Plank): no weight field, one seconds input per named variant hold
-  - Completed sets: shown in green with the logged result formatted per the above. **Tappable** — opens the same inputs pre-filled with the logged values (rather than placeholders) plus Save/Cancel buttons, so a mis-logged set can be corrected without redoing the whole exercise. Only one set can be edited at a time; editing doesn't restart the rest timer or disturb which set is "active" next. Since `sessionData` isn't written to `localStorage` until "Complete Workout" is tapped (see 8.2), a correction here never needs to touch history separately — the fixed value just flows through whatever gets saved at the end
+  - Every set shape above also gets its own **Rest** pill row (same 30s/60s/90s/2m/3m options), pre-selected to the exercise's current default — see 5.2b. Changing it only affects that one set; it doesn't touch the exercise default
+  - Completed sets: shown in green with the logged result formatted per the above. **Tappable** — opens the same inputs pre-filled with the logged values (rather than placeholders), including the rest pill pre-selected to whatever was actually used for that set, plus Save/Cancel buttons, so a mis-logged set can be corrected without redoing the whole exercise. Only one set can be edited at a time; editing doesn't restart the rest timer or disturb which set is "active" next. Since `sessionData` isn't written to `localStorage` until "Complete Workout" is tapped (see 8.2), a correction here never needs to touch history separately — the fixed value just flows through whatever gets saved at the end
   - Active set (next uncompleted): the appropriate inputs + "Complete Set" button
   - Pending sets: dimmed, no interaction until prior set is completed
-- **Default values:** if the user leaves weight or reps blank and taps "Complete Set" (or Save, when editing), the app uses the placeholder value shown in the input — either the last session's logged weight for that exercise, or the starting weight from the program
+- **Default values:** if the user leaves weight or reps blank and taps "Complete Set" (or Save, when editing), the app uses the placeholder value shown in the input — either the last session's logged weight for that exercise, or the starting weight from the program. The rest pill always has an explicit selection (no blank state)
 - **Rest timer bar** (see 5.2b): always visible at the bottom of this screen
 - When all sets are done, an "All sets complete!" confirmation is shown with a back button
 
@@ -137,12 +147,14 @@ A full-screen takeover opened by tapping any exercise in the list. This is the o
 
 A persistent bar docked to the bottom of the Exercise Detail View — it never scrolls away and is always visible to the user.
 
-- Starts automatically after the user taps "Complete Set", provided there are more sets remaining
-- Default rest period: 90 seconds (adjustable in settings: 30s / 60s / 90s / 120s / 180s)
+- Rest duration is a property of the **set being completed**, not a single global/session-wide setting — each set carries whatever value its own Rest pill was showing when "Complete Set" was tapped (inherited from the exercise default unless overridden for that set)
+- Starts automatically after the user taps "Complete Set", using that set's chosen duration, provided there are more sets remaining
 - Shows a large countdown and a depleting pink fill behind it (matches `--accent-primary`, updated from the original blue when the app was re-themed)
 - Turns green and pulses (with haptic vibration on supported devices — vibration is a no-op on iOS Safari, which has never implemented the Vibration API; the chime still sounds) when time is up
 - "Skip" button dismisses the timer early
 - Timer stops when the user taps "← Back" to return to the exercise list
+- Completed/historical sets keep whatever rest value was actually used at the time — changing an exercise's default later never retroactively rewrites already-logged sets (each set's `restSeconds` is baked in at completion time)
+- Sets saved before this feature existed have no `restSeconds` at all; anywhere that value is read falls back to the exercise's current default (ultimately 90s if nothing else is set) rather than erroring
 
 ### 5.3 Weight Trend Chart
 
@@ -219,6 +231,10 @@ an app rewrite. An in-app UI for switching between multiple *saved* programs is 
   against any future layout squeeze clipping the display value
 - **Minimal navigation:** get in, log the workout, get out
 - **Colours:** simple, clean — no unnecessary decoration
+- **Reuse over new components:** the pill-selector pattern (`.rest-selector`/`.rest-opt-btn`)
+  introduced for the original global rest picker was kept and reused as-is for both the
+  per-exercise default and the per-set override, rather than inventing a new control — same look,
+  same interaction, just re-scoped to smaller pieces of the UI
 
 ---
 
@@ -236,16 +252,25 @@ than a rewrite — see Section 4 for the current program content in full.
 {
   id: 'db-one-arm-row', name: 'DB One-Arm Row',
   sets: 3, reps: 8, type: 'reps', sideMode: 'perSide', unit: 'kg', startWeight: null,
+  defaultRestSeconds: 90,
   tempo: null, note: '2 second pause at the top of each rep.', warning: null,
   video: 'videos/db-one-arm-row.mp4', sourceVideoUrl: 'https://youtube.com/shorts/...'
 }
 ```
 
-### 8.2 Session history (localStorage)
+`defaultRestSeconds` is the exercise's baseline — currently 90s uniformly across every exercise in
+the program (Jess's PDF didn't specify per-exercise rest periods). It's a starting point, not a
+final answer: the user tunes it per exercise from the Exercise Detail View (see 5.2a), which is
+stored as an override rather than editing this baseline directly (see `exerciseRestDefaults` below)
+so it doesn't require a code change/redeploy to adjust.
+
+### 8.2 Session history & settings (localStorage)
 
 Each saved session **snapshots** the exercise metadata it needs to render correctly (name, unit,
 type, sideMode, tempo) rather than looking it up in the live `PROGRAM` at display time — so old
-sessions keep rendering correctly even after `PROGRAM` is replaced by a future cycle.
+sessions keep rendering correctly even after `PROGRAM` is replaced by a future cycle. Each set also
+snapshots the `restSeconds` actually used for it at the time — the exercise's default can change
+later without rewriting history.
 
 ```json
 {
@@ -266,12 +291,15 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
           "sideMode": "perSide",
           "tempo": null,
           "sets": [
-            { "setNumber": 1, "weight": 12, "repsL": 8, "repsR": 8 }
+            { "setNumber": 1, "weight": 12, "repsL": 8, "repsR": 8, "restSeconds": 60 }
           ]
         }
       ]
     }
-  ]
+  ],
+  "exerciseRestDefaults": {
+    "db-one-arm-row": 60
+  }
 }
 ```
 
@@ -313,7 +341,7 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 | 3a | Exercise detail view — full-screen takeover with GIF, set logging, defaults | Complete |
 | 4 | localStorage save/load | Complete |
 | 5 | Previous session pre-fill (last weight shown as input placeholder) | Complete |
-| 6 | Rest timer — sticky bar in detail view, configurable, vibration alert, skip | Complete |
+| 6 | Rest timer — sticky bar in detail view, configurable, vibration alert, skip | Complete — "configurable" superseded by Phase 23 (per-exercise/per-set instead of one global picker) |
 | 7 | Progress graph per exercise (e1RM over time via Chart.js) | Superseded by Phase 22 — implemented as a raw weight-trend chart instead, no e1RM/derived metric, no Chart.js |
 | 8 | Exercise history view | Superseded by Phase 22 — the standalone History screen was removed in favour of the per-exercise chart |
 | 9 | PWA polish — icons, offline, install prompt | Complete |
@@ -330,3 +358,4 @@ sessions keep rendering correctly even after `PROGRAM` is replaced by a future c
 | 20 | Completed sets are now editable — tap a logged set to correct weight/reps (pre-filled, not placeholders) instead of it being display-only; input element IDs scoped per set number so the edited row and the still-active next row never collide; edit doesn't touch localStorage directly or restart the rest timer, since sessionData is the single source of truth until "Complete Workout" persists it all at once | Complete |
 | 21 | Home screen day-card heading now shows the workout name (e.g. "Chest / Shoulders / Triceps") instead of "Day A" — the old muscle-group subtitle line was dropped since the heading replaced it; the "A"/"B"/"C" day id is untouched everywhere it's used functionally (`data-day` attributes, localStorage `dayId`), only removed from this one piece of visible text | Complete |
 | 22 | Removed the standalone History screen (`history.html` deleted, nav/button references cleaned up) and replaced it with a per-exercise Weight Trend Chart at the bottom of the Exercise Detail View — one point per session (heaviest set that day), rolling 6-month window, raw data only (see 5.3). Hand-rolled inline SVG rather than Chart.js, to stay offline-safe. Service worker cache bumped to v3 | Complete |
+| 23 | Stopwatch + per-set rest timer — added a manual count-up stopwatch (5.1b) in the old global rest-selector's slot; removed the global rest-duration picker entirely and replaced it with a per-exercise default (5.2a) plus a per-set override (5.2a/5.2b), so different exercises/sets can rest for different lengths of time instead of one setting for the whole session. `PROGRAM` exercises gained `defaultRestSeconds`; sessions gained per-set `restSeconds`; `localStorage` gained an `exerciseRestDefaults` override map (see 8.1/8.2). Input element IDs for the rest pills follow the same per-set-number scoping as the weight/reps fields, avoiding collisions between an edited row and the still-active next row. Service worker cache bumped to v4 | Complete |
