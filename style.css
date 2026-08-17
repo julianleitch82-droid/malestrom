@@ -1032,12 +1032,14 @@ input:focus-visible {
     opacity: 0.7;
 }
 
-/* Per-set rest override, nested inside an active/editing set card —
-   reuses .rest-selector-label/.rest-select, just a different wrapper with
-   tighter spacing and a divider from the fields above. flex-basis: 100%
-   forces it onto its own line within the flex-wrap parent
-   (.active-set-inputs), below the weight/reps fields rather than squeezed
-   beside them. */
+/* Per-set rest override + machine setup notes, nested inside an
+   active/editing set card — reuses .rest-selector-label/.rest-select, just
+   a different wrapper with tighter spacing and a divider from the fields
+   above. flex-basis: 100% forces it onto its own line within the flex-wrap
+   parent (.active-set-inputs), below the weight/reps fields rather than
+   squeezed beside them. Rest control stays left-justified (.set-rest-control
+   doesn't grow/shrink); the notes input takes whatever space is left on
+   the right. */
 .set-rest-selector {
     display: flex;
     align-items: center;
@@ -1046,6 +1048,41 @@ input:focus-visible {
     margin-top: var(--spacing-sm);
     padding-top: var(--spacing-sm);
     border-top: 1px solid var(--border-color);
+}
+
+.set-rest-control {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
+}
+
+/* Free-text "machine setup" note (e.g. "seat height 4, pin 6") — same
+   bordered-box look as .input-group input (weight/reps), just sized to sit
+   compactly in this row alongside .rest-select rather than at the full
+   touch-target height used for the main set inputs above. */
+.setup-notes-input {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-height: 36px;
+    background-color: var(--bg-card);
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+}
+
+.setup-notes-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background-color: rgba(var(--accent-primary-rgb), 0.05);
+}
+
+.setup-notes-input::placeholder {
+    color: var(--text-muted);
 }
 
 /* ===================================================================

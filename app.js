@@ -1053,21 +1053,43 @@ function formatRestLabel(seconds) {
 }
 
 /**
- * Per-set rest-duration override dropdown — appended to every active/editing
- * set's inputs (all exercise types get a rest period, including timed
- * holds). Pre-selects the set's existing restSeconds when editing a past
- * set, or the exercise's current default for a new set — per-set changes
- * here don't touch the exercise default itself.
+ * Escapes a user-typed string for safe embedding inside an HTML attribute
+ * (e.g. value="..."). Only needed for the machine-setup notes field below —
+ * every other input's `value` is numeric (weight/reps), which can't contain
+ * a stray `"` that would otherwise break out of the attribute.
  */
-function renderRestSelectHtml(setNum, selectedSeconds) {
+function escapeAttr(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+/**
+ * Per-set rest-duration override dropdown, plus a free-text "machine setup"
+ * notes field (e.g. "seat height 4, pin 6") — appended to every
+ * active/editing set's inputs (all exercise types get both, including
+ * timed holds). Rest pre-selects the set's existing restSeconds when
+ * editing a past set, or the exercise's current default for a new set —
+ * per-set changes here don't touch the exercise default itself. Notes has
+ * no such default/inheritance; it's just whatever was typed for this set,
+ * blank otherwise.
+ */
+function renderRestSelectHtml(setNum, selectedSeconds, setupNotes) {
     return `
         <div class="set-rest-selector">
-            <span class="rest-selector-label">Rest</span>
-            <select class="rest-select" id="set-rest-${setNum}">
-                ${REST_OPTIONS.map(s => `
-                    <option value="${s}"${s === selectedSeconds ? ' selected' : ''}>${formatRestLabel(s)}</option>
-                `).join('')}
-            </select>
+            <div class="set-rest-control">
+                <span class="rest-selector-label">Rest</span>
+                <select class="rest-select" id="set-rest-${setNum}">
+                    ${REST_OPTIONS.map(s => `
+                        <option value="${s}"${s === selectedSeconds ? ' selected' : ''}>${formatRestLabel(s)}</option>
+                    `).join('')}
+                </select>
+            </div>
+            <input type="text" class="setup-notes-input" id="set-setup-${setNum}"
+                   placeholder="Machine setup (optional)"
+                   value="${escapeAttr(setupNotes || '')}">
         </div>
     `;
 }
@@ -1077,9 +1099,14 @@ function readSetRestSeconds(setNum, exercise) {
     return select ? parseInt(select.value) : getExerciseRestDefault(exercise);
 }
 
+function readSetupNotes(setNum) {
+    const input = document.getElementById(`set-setup-${setNum}`);
+    return input ? input.value.trim() : '';
+}
+
 function renderActiveSetInputs(exercise, setNum, existingData) {
     const restSeconds = existingData?.restSeconds ?? getExerciseRestDefault(exercise);
-    const restSelectHtml = renderRestSelectHtml(setNum, restSeconds);
+    const restSelectHtml = renderRestSelectHtml(setNum, restSeconds, existingData?.setupNotes);
 
     if (exercise.sideMode === 'variants') {
         const seconds = existingData?.seconds;
@@ -1148,13 +1175,14 @@ function formatSetResult(exercise, data) {
  */
 function readSetInputs(exercise, setNum) {
     const restSeconds = readSetRestSeconds(setNum, exercise);
+    const setupNotes = readSetupNotes(setNum);
 
     if (exercise.sideMode === 'variants') {
         const secondsInput = document.getElementById(`set-seconds-${setNum}`);
         const seconds = secondsInput.value !== ''
             ? parseInt(secondsInput.value)
             : parseInt(secondsInput.placeholder) || exercise.holdSeconds;
-        return { seconds, restSeconds };
+        return { seconds, restSeconds, setupNotes };
     }
 
     const weightInput = document.getElementById(`set-weight-${setNum}`);
@@ -1167,12 +1195,12 @@ function readSetInputs(exercise, setNum) {
         const repsRInput = document.getElementById(`set-reps-r-${setNum}`);
         const repsL = repsLInput.value !== '' ? parseInt(repsLInput.value) : parseInt(repsLInput.placeholder) || exercise.reps;
         const repsR = repsRInput.value !== '' ? parseInt(repsRInput.value) : parseInt(repsRInput.placeholder) || exercise.reps;
-        return { weight, repsL, repsR, restSeconds };
+        return { weight, repsL, repsR, restSeconds, setupNotes };
     }
 
     const repsInput = document.getElementById(`set-reps-${setNum}`);
     const reps = repsInput.value !== '' ? parseInt(repsInput.value) : parseInt(repsInput.placeholder) || exercise.reps;
-    return { weight, reps, restSeconds };
+    return { weight, reps, restSeconds, setupNotes };
 }
 
 function completeSet(exerciseIndex, setNum, exercise) {
