@@ -136,7 +136,8 @@ A full-screen takeover opened by tapping any exercise in the list. This is the o
   - `T` (total combined): one weight input + one reps input, labeled "(total)"
   - Timed variants (e.g. Plank & Side Plank): no weight field, one seconds input per named variant hold
   - Every set shape above also gets its own **Rest** dropdown (same 30s/60s/90s/2m/3m options), pre-selected to the exercise's current default — see 5.2b. Changing it only affects that one set; it doesn't touch the exercise default
-  - Completed sets: shown in green with the logged result formatted per the above. **Tappable** — opens the same inputs pre-filled with the logged values (rather than placeholders), including the rest dropdown pre-selected to whatever was actually used for that set, plus Save/Cancel buttons, so a mis-logged set can be corrected without redoing the whole exercise. Only one set can be edited at a time; editing doesn't restart the rest timer or disturb which set is "active" next. Since `sessionData` isn't written to `localStorage` until "Complete Workout" is tapped (see 8.2), a correction here never needs to touch history separately — the fixed value just flows through whatever gets saved at the end
+  - Every set shape above also gets a free-text **machine setup** field (e.g. "seat height 4, pin 6") in the same row as the Rest dropdown — dropdown left-justified, notes field filling the remaining space on the right. Per-set, not per-exercise: no default or inheritance from the exercise or previous sessions, blank unless something was typed for that specific set
+  - Completed sets: shown in green with the logged result formatted per the above. **Tappable** — opens the same inputs pre-filled with the logged values (rather than placeholders), including the rest dropdown and machine setup note pre-filled to whatever was actually used for that set, plus Save/Cancel buttons, so a mis-logged set can be corrected without redoing the whole exercise. Only one set can be edited at a time; editing doesn't restart the rest timer or disturb which set is "active" next. Since `sessionData` isn't written to `localStorage` until "Complete Workout" is tapped (see 8.2), a correction here never needs to touch history separately — the fixed value just flows through whatever gets saved at the end
   - Active set (next uncompleted): the appropriate inputs + "Complete Set" button
   - Pending sets: dimmed, no interaction until prior set is completed
 - **Default values:** if the user leaves weight or reps blank and taps "Complete Set" (or Save, when editing), the app uses the placeholder value shown in the input — either the last session's logged weight for that exercise, or the starting weight from the program. The rest dropdown always has an explicit selection (no blank state)
@@ -273,7 +274,9 @@ Each saved session **snapshots** the exercise metadata it needs to render correc
 type, sideMode, tempo) rather than looking it up in the live `PROGRAM` at display time — so old
 sessions keep rendering correctly even after `PROGRAM` is replaced by a future cycle. Each set also
 snapshots the `restSeconds` actually used for it at the time — the exercise's default can change
-later without rewriting history.
+later without rewriting history — and an optional free-text `setupNotes` string, blank by default;
+sets saved before this feature existed simply don't have the key, same backward-compatible pattern
+as `restSeconds` (see 5.2b).
 
 ```json
 {
@@ -294,7 +297,7 @@ later without rewriting history.
           "sideMode": "perSide",
           "tempo": null,
           "sets": [
-            { "setNumber": 1, "weight": 12, "repsL": 8, "repsR": 8, "restSeconds": 60 }
+            { "setNumber": 1, "weight": 12, "repsL": 8, "repsR": 8, "restSeconds": 60, "setupNotes": "seat height 4, pin 6" }
           ]
         }
       ]
@@ -363,3 +366,4 @@ later without rewriting history.
 | 22 | Removed the standalone History screen (`history.html` deleted, nav/button references cleaned up) and replaced it with a per-exercise Weight Trend Chart at the bottom of the Exercise Detail View — one point per session (heaviest set that day), rolling 6-month window, raw data only (see 5.3). Hand-rolled inline SVG rather than Chart.js, to stay offline-safe. Service worker cache bumped to v3 | Complete |
 | 23 | Stopwatch + per-set rest timer — added a manual count-up stopwatch (5.1b) in the old global rest-selector's slot; removed the global rest-duration picker entirely and replaced it with a per-exercise default (5.2a) plus a per-set override (5.2a/5.2b), so different exercises/sets can rest for different lengths of time instead of one setting for the whole session. `PROGRAM` exercises gained `defaultRestSeconds`; sessions gained per-set `restSeconds`; `localStorage` gained an `exerciseRestDefaults` override map (see 8.1/8.2). Input element IDs for the rest dropdowns follow the same per-set-number scoping as the weight/reps fields, avoiding collisions between an edited row and the still-active next row. Service worker cache bumped to v4 | Complete |
 | 24 | Rest-duration controls (5.2a/5.2b) changed from a horizontally-scrolling pill row to a native `<select>` dropdown, for both the per-exercise default and the per-set override — gym testing found the pill row overflowed on mobile, clipping the "3m" option at the screen edge. Selected-value behaviour, per-set-number ID scoping, and localStorage/`restSeconds` wiring are unchanged, only the control markup/CSS. Service worker cache bumped to v5 (was left at v4 initially; fixed in a same-day follow-up) so returning users pick up the new markup instead of a stale cached copy | Complete |
+| 25 | Free-text "machine setup" notes field (e.g. "seat height 4, pin 6") added to the per-set row, same row as the Rest dropdown — dropdown left-justified, notes field filling the remaining space on the right (5.2a). Per-set scoped like weight/reps/rest (`set-setup-${setNum}`); persisted the same way — rides along in the entry object `readSetInputs()` returns, so no separate persistence code was needed. Sessions gained an optional per-set `setupNotes` string (see 8.2). Not shown on the collapsed/completed-set summary line — only visible when a set is active or being edited | Complete |
